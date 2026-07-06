@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Optional local pre-push hook — run ./scripts/install-git-hooks.sh once
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+echo "pre-push: running smoke.sh (standard)"
+./scripts/smoke.sh

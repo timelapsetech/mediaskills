@@ -1,0 +1,94 @@
+---
+import type { Cookbook } from "../lib/catalog";
+
+interface Props {
+  cookbook: Cookbook;
+}
+
+const { cookbook } = Astro.props;
+const href = `/cookbooks/${cookbook.slug}/`;
+---
+
+<a href={href} class="card card-interactive cookbook-card">
+  <div class="cookbook-visual" aria-hidden="true">
+    <div class="timeline">
+      {(cookbook.steps[0] ?? "").split("\n").slice(0, 4).map((_, i) => (
+        <span class="dot" style={`--i: ${i}`} />
+      ))}
+    </div>
+  </div>
+  <div class="card-body">
+    <span class="pill pill-accent">Cookbook</span>
+    <h3>{cookbook.title}</h3>
+    <p>{cookbook.summary}</p>
+    {cookbook.skillsChain && <p class="chain">{cookbook.skillsChain}</p>}
+  </div>
+</a>
+
+<style>
+  .cookbook-card {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .cookbook-card:hover {
+    color: inherit;
+  }
+
+  .cookbook-visual {
+    height: 100px;
+    background: linear-gradient(135deg, #12121c 0%, #1a1030 50%, #0c1818 100%);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cookbook-visual::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 40px,
+      rgba(0, 229, 184, 0.03) 40px,
+      rgba(0, 229, 184, 0.03) 41px
+    );
+  }
+
+  .timeline {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: calc(1 - var(--i) * 0.2);
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
+
+  .cookbook-card h3 {
+    margin-top: 0.75rem;
+    font-size: 1.125rem;
+  }
+
+  .cookbook-card p {
+    font-size: 0.9rem;
+    color: var(--text-2);
+    margin-bottom: 0.5rem;
+  }
+
+  .chain {
+    font-family: var(--font-mono);
+    font-size: 0.75rem !important;
+    color: var(--text-3) !important;
+  }
+</style>

@@ -1,0 +1,14 @@
+{
+  "format": {
+    "tags": {
+      "timecode": "01:00:00;00",
+      "time_code_settings": "Drop frame"
+    }
+  },
+  "streams": [
+    {
+      "codec_type": "video",
+      "avg_frame_rate": "30000/1001"
+    }
+  ]
+}

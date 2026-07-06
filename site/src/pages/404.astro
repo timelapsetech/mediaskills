@@ -1,0 +1,44 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Not found" description="Page not found on mediaskills.ai" path="/404/" noindex={true}>
+  <section class="section">
+    <div class="container not-found">
+      <h1>404</h1>
+      <p>This page doesn't exist. Try searching skills and cookbooks.</p>
+      <div class="actions">
+        <button type="button" class="btn btn-primary" id="nf-search">Search</button>
+        <a href="/" class="btn btn-ghost">Home</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  document.getElementById("nf-search")?.addEventListener("click", () => {
+    document.getElementById("open-search")?.click();
+  });
+</script>
+
+<style>
+  .not-found {
+    text-align: center;
+    padding: 4rem 0;
+  }
+
+  .not-found h1 {
+    font-size: 4rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+  }
+</style>

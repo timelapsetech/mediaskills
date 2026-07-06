@@ -1,0 +1,19 @@
+name: Skill request
+description: Suggest a new skill or script
+title: "[skill]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What workflow do you need?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Should this be a new skill or extend an existing one?
+  - type: textarea
+    id: binaries
+    attributes:
+      label: Required binaries or libraries

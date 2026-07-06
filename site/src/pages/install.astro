@@ -1,0 +1,87 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCatalog } from "../lib/catalog";
+import { SITE } from "../lib/seo";
+
+const catalog = getCatalog();
+const { install } = catalog;
+---
+
+<BaseLayout
+  title="Install"
+  description="Install mediaskills Agent Skills with npx skills add — pin versions, run doctor.sh, and route agents to the right skill."
+  path="/install/"
+>
+  <div class="page-hero">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a><span class="sep">/</span><span>Install</span>
+      </nav>
+      <h1>Install for agents</h1>
+      <p class="lead">
+        mediaskills follows the <a href="https://agentskills.io/specification">Agent Skills spec</a>. Install per-skill or all at once — pin <code>{install.pin}</code> for reproducible environments.
+      </p>
+    </div>
+  </div>
+
+  <section class="section section-tight">
+    <div class="container content-narrow">
+      <h2>Quick start</h2>
+      <div class="step-card">
+        <h3>1. Install a skill</h3>
+        <pre class="code-block"><code>{install.commands.one}</code></pre>
+      </div>
+      <div class="step-card">
+        <h3>2. Verify system tools</h3>
+        <pre class="code-block"><code>{install.commands.doctor}</code></pre>
+      </div>
+      <div class="step-card">
+        <h3>3. List all available skills</h3>
+        <pre class="code-block"><code>{install.commands.list}</code></pre>
+      </div>
+
+      <h2>Install everything</h2>
+      <pre class="code-block"><code>{install.commands.all}</code></pre>
+
+      <h2>System dependencies</h2>
+      <p>Most skills need <strong>ffmpeg</strong> and <strong>ffprobe</strong>. The <code>install-media-tools</code> skill detects and installs missing binaries on macOS and Debian/Ubuntu.</p>
+      <pre class="code-block"><code>bash skills/install-media-tools/scripts/install.sh</code></pre>
+
+      <h2>Agent routing</h2>
+      <p>Point your agent at <a href={`${SITE.repo}/blob/master/AGENTS.md`}>AGENTS.md</a> or browse the <a href="/skills/">skills catalog</a> and <a href="/cookbooks/">cookbooks</a> on this site.</p>
+
+      <h2>JSON contract</h2>
+      <p>Every script returns structured JSON on stdout. Failures emit JSON on stderr with stable exit codes.</p>
+      <pre class="code-block"><code>{`{"ok": true, "op": "inspect.probe", "data": {...}, "output_paths": []}`}</code></pre>
+      <p><a href={`${SITE.repo}/blob/master/docs/SCRIPT_CONTRACT.md`}>Full script contract →</a></p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .content-narrow {
+    max-width: 720px;
+  }
+
+  .step-card {
+    margin-bottom: 1.5rem;
+    padding: 1.25rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--bg-2);
+  }
+
+  .step-card h3 {
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+  }
+
+  h2 {
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  strong {
+    color: var(--text-0);
+  }
+</style>

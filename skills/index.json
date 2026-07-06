@@ -1,0 +1,932 @@
+{
+  "version": "0.1.0",
+  "repository": "https://github.com/timelapsetech/mediaskills",
+  "spec": "https://agentskills.io/specification",
+  "skill_count": 13,
+  "skills": [
+    {
+      "name": "audio",
+      "description": "Extract, convert, trim, concatenate, normalize, fade, resample, and silence-detect audio using ffmpeg. Use when you need to modify audio tracks, change format or sample rate, edit timeline segments, or prepare audio for muxing back onto video.",
+      "license": "MIT",
+      "compatibility": "Requires ffmpeg and ffprobe on PATH. Scripts are Python 3.11+, run via `uv run` (no separate install step).",
+      "metadata": {
+        "mediaskills-category": "audio"
+      },
+      "scripts": [
+        {
+          "script": "concat.py",
+          "language": "python",
+          "op": "audio.concat",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--output"
+          ]
+        },
+        {
+          "script": "convert.py",
+          "language": "python",
+          "op": "audio.convert",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "extract.py",
+          "language": "python",
+          "op": "audio.extract",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input",
+            "--output"
+          ]
+        },
+        {
+          "script": "fade.py",
+          "language": "python",
+          "op": "audio.fade",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "normalize.py",
+          "language": "python",
+          "op": "audio.normalize",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "probe.py",
+          "language": "python",
+          "op": "audio.probe",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "resample.py",
+          "language": "python",
+          "op": "audio.resample",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "silence_detect.py",
+          "language": "python",
+          "op": "audio.silence_detect",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "trim.py",
+          "language": "python",
+          "op": "audio.trim",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "captions-compliance",
+      "description": "Broadcast caption compliance \u2014 validate and format SRT, export CEA-608 SCC and SMPTE-TT, flag busy-zone collisions, and transcribe speech to captions. Use when delivering FCC-aligned captions or handoff to linear/broadcast workflows.",
+      "license": "MIT",
+      "compatibility": "Requires Python 3.11+. `to-captions-pipeline.py` needs ffmpeg and faster-whisper (via `uv run`). Run scripts via `uv run`.",
+      "metadata": {
+        "mediaskills-category": "captions"
+      },
+      "scripts": [
+        {
+          "script": "apply-busy-zones.py",
+          "language": "python",
+          "op": "caption.apply_busy_zones",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "format.py",
+          "language": "python",
+          "op": "caption.format",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "info.py",
+          "language": "python",
+          "op": null,
+          "pep723_dependencies": [],
+          "common_flags": []
+        },
+        {
+          "script": "rules.py",
+          "language": "python",
+          "op": "caption.rules",
+          "pep723_dependencies": [],
+          "common_flags": []
+        },
+        {
+          "script": "to-captions-pipeline.py",
+          "language": "python",
+          "op": "caption.to_captions_pipeline",
+          "pep723_dependencies": [
+            "#   \"faster-whisper>=1.0.3",
+            "#"
+          ],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "to-scc.py",
+          "language": "python",
+          "op": "caption.to_scc",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "to-smpte-tt.py",
+          "language": "python",
+          "op": "caption.to_smpte_tt",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "validate.py",
+          "language": "python",
+          "op": "caption.validate",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "download",
+      "description": "Download video and audio from URLs using yt-dlp. Use when you need to fetch media from YouTube, Vimeo, or other supported sites before local processing with inspect, audio, or video-transformation skills.",
+      "license": "MIT",
+      "compatibility": "Requires yt-dlp on PATH. Scripts are Python 3.11+, run via `uv run`. Network access required.",
+      "metadata": {
+        "mediaskills-category": "acquire"
+      },
+      "scripts": [
+        {
+          "script": "url.py",
+          "language": "python",
+          "op": "download.url",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--url"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "image",
+      "description": "Convert, resize, crop, rotate, flip, optimize, read EXIF, strip metadata, and OCR images using ImageMagick, exiftool, and Tesseract. Use when you need to transform still images, reduce file size, inspect camera metadata, remove sensitive EXIF before sharing, or extract text from screenshots and scans.",
+      "license": "MIT",
+      "compatibility": "Requires ImageMagick (`convert`), exiftool, and tesseract on PATH. Scripts are Python 3.11+, run via `uv run`.",
+      "metadata": {
+        "mediaskills-category": "transform"
+      },
+      "scripts": [
+        {
+          "script": "convert.py",
+          "language": "python",
+          "op": "image.convert",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "crop.py",
+          "language": "python",
+          "op": "image.crop",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "flip.py",
+          "language": "python",
+          "op": "image.flip",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "ocr.py",
+          "language": "python",
+          "op": "image.ocr",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "optimize.py",
+          "language": "python",
+          "op": "image.optimize",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "read_exif.py",
+          "language": "python",
+          "op": "image.read_exif",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "resize.py",
+          "language": "python",
+          "op": "image.resize",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "rotate.py",
+          "language": "python",
+          "op": "image.rotate",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "strip_metadata.py",
+          "language": "python",
+          "op": "image.strip_metadata",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "inspect",
+      "description": "Probe, describe, compare, and batch-inspect video, audio, and image files using ffprobe. Use when you need metadata (duration, resolution, codecs, size), want to compare two files before/after processing, or need structured probe data to answer questions about a media file without modifying it.",
+      "license": "MIT",
+      "compatibility": "Requires ffprobe on PATH. Scripts are Python 3.11+, run via `uv run` (no separate install step).",
+      "metadata": {
+        "mediaskills-category": "inspect"
+      },
+      "scripts": [
+        {
+          "script": "ask.py",
+          "language": "python",
+          "op": "inspect.ask",
+          "pep723_dependencies": [],
+          "common_flags": []
+        },
+        {
+          "script": "batch_probe.py",
+          "language": "python",
+          "op": "inspect.batch_probe",
+          "pep723_dependencies": [],
+          "common_flags": []
+        },
+        {
+          "script": "compare.py",
+          "language": "python",
+          "op": "inspect.compare",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "describe.py",
+          "language": "python",
+          "op": "inspect.describe",
+          "pep723_dependencies": [],
+          "common_flags": []
+        },
+        {
+          "script": "duration.py",
+          "language": "python",
+          "op": "inspect.duration",
+          "pep723_dependencies": [],
+          "common_flags": []
+        },
+        {
+          "script": "info.py",
+          "language": "python",
+          "op": null,
+          "pep723_dependencies": [],
+          "common_flags": []
+        },
+        {
+          "script": "probe.py",
+          "language": "python",
+          "op": "inspect.probe",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "resolution.py",
+          "language": "python",
+          "op": "inspect.resolution",
+          "pep723_dependencies": [],
+          "common_flags": []
+        }
+      ]
+    },
+    {
+      "name": "install-media-tools",
+      "description": "Detect, verify, and install media processing binaries (ffmpeg, ImageMagick, exiftool, tesseract, yt-dlp, uv) on macOS and Linux. Use before other mediaskills when doctor reports missing tools, when ffprobe/ffmpeg is not found, or when setting up a fresh dev machine or CI runner.",
+      "license": "MIT",
+      "compatibility": "Bash scripts only \u2014 no uv required. Uses python3 for JSON output (stdlib). install.sh may invoke brew or apt with elevated privileges on Linux.",
+      "metadata": {
+        "mediaskills-category": "setup"
+      },
+      "scripts": [
+        {
+          "script": "detect-tools.sh",
+          "language": "bash",
+          "op": "install-media-tools.detect_tools",
+          "pep723_dependencies": []
+        },
+        {
+          "script": "doctor.sh",
+          "language": "bash",
+          "op": "install-media-tools.doctor",
+          "pep723_dependencies": []
+        },
+        {
+          "script": "install.sh",
+          "language": "bash",
+          "op": "install-media-tools.install",
+          "pep723_dependencies": []
+        },
+        {
+          "script": "which.sh",
+          "language": "bash",
+          "op": "install-media-tools.which",
+          "pep723_dependencies": []
+        }
+      ]
+    },
+    {
+      "name": "program-master",
+      "description": "TV program segmentation \u2014 detect black+silent break separators, probe boundary frames, and label content segments (including slate-driven labels). Use when finding commercial breaks, naming episodes/parts, or mapping broadcast master structure \u2014 not hard cuts inside content.",
+      "license": "MIT",
+      "compatibility": "Requires ffmpeg and ffprobe on PATH. Optional tesseract for OCR slate text. Scripts are Python 3.11+, run via `uv run`.",
+      "metadata": {
+        "mediaskills-category": "video"
+      },
+      "scripts": [
+        {
+          "script": "analyze_structure.py",
+          "language": "python",
+          "op": "program_master.analyze_structure",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input",
+            "--fps"
+          ]
+        },
+        {
+          "script": "compile.py",
+          "language": "python",
+          "op": "program_master.compile",
+          "pep723_dependencies": [],
+          "common_flags": []
+        },
+        {
+          "script": "detect_black_silence.py",
+          "language": "python",
+          "op": "program_master.detect_black_silence",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "detect_blacks.py",
+          "language": "python",
+          "op": "program_master.detect_blacks",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "detect_silence.py",
+          "language": "python",
+          "op": "program_master.detect_silence",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "label_segments.py",
+          "language": "python",
+          "op": "program_master.label_segments",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input",
+            "--fps"
+          ]
+        },
+        {
+          "script": "schema.py",
+          "language": "python",
+          "op": "program_master.schema",
+          "pep723_dependencies": [],
+          "common_flags": []
+        }
+      ]
+    },
+    {
+      "name": "shots",
+      "description": "Detect hard cuts (shot boundaries) in video via ffmpeg scene detection and extract midpoint stills per shot. Use when the unit of analysis is a shot \u2014 cataloging cuts, QC, or feeding shot-level frames to vision/OCR \u2014 not TV program structure or commercial breaks.",
+      "license": "MIT",
+      "compatibility": "Requires ffmpeg and ffprobe on PATH. Scripts are Python 3.11+, run via `uv run` (no separate install step).",
+      "metadata": {
+        "mediaskills-category": "video"
+      },
+      "scripts": [
+        {
+          "script": "detect.py",
+          "language": "python",
+          "op": "shots.detect",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "extract-frames.py",
+          "language": "python",
+          "op": "shots.extract_frames",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "speech-captions",
+      "description": "Transcribe speech to timed captions with faster-whisper, detect spoken language, and build SRT/VTT from text or segments. Use when you need automatic captions from audio/video, language detection before transcription, or subtitle files from transcript JSON.",
+      "license": "MIT",
+      "compatibility": "Requires ffmpeg on PATH. Transcription scripts need Python 3.11+ with faster-whisper (installed automatically via `uv run`). CPU-friendly `tiny` model is the default.",
+      "metadata": {
+        "mediaskills-category": "captions"
+      },
+      "scripts": [
+        {
+          "script": "detect-language.py",
+          "language": "python",
+          "op": "speech_captions.detect_language",
+          "pep723_dependencies": [
+            "faster-whisper>=1.0.3"
+          ],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "to-srt.py",
+          "language": "python",
+          "op": "speech_captions.to_srt",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "to-vtt.py",
+          "language": "python",
+          "op": "speech_captions.to_vtt",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "transcribe.py",
+          "language": "python",
+          "op": "speech_captions.transcribe",
+          "pep723_dependencies": [
+            "faster-whisper>=1.0.3"
+          ],
+          "common_flags": [
+            "--input"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "subtitles",
+      "description": "Convert, shift, extract, and burn subtitle files (SRT/WebVTT). Use when you already have caption text or embedded subtitle tracks and need format conversion, sync adjustment, extraction from containers, or hardcoded captions on video.",
+      "license": "MIT",
+      "compatibility": "Requires ffmpeg and ffprobe on PATH. `burn.py` also needs Pillow (installed via `uv run`). Scripts are Python 3.11+.",
+      "metadata": {
+        "mediaskills-category": "captions"
+      },
+      "scripts": [
+        {
+          "script": "burn.py",
+          "language": "python",
+          "op": "subtitles.burn",
+          "pep723_dependencies": [
+            "#   \"pillow>=10.0.0",
+            "#"
+          ],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "convert.py",
+          "language": "python",
+          "op": "subtitles.convert",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "extract.py",
+          "language": "python",
+          "op": "subtitles.extract",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input",
+            "--output"
+          ]
+        },
+        {
+          "script": "shift.py",
+          "language": "python",
+          "op": "subtitles.shift",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "timecode",
+      "description": "SMPTE timecode arithmetic with drop-frame and non-drop-frame support \u2014 convert between timecode and seconds, add/subtract offsets, retime between frame rates, convert DF\u2194NDF, and infer format from strings or ffprobe/MediaInfo metadata. Use when edit decisions are expressed as HH:MM:SS:FF or HH:MM:SS;FF or when aligning clips at NTSC rates.",
+      "license": "MIT",
+      "compatibility": "Requires Python 3.11+. Scripts use the `timecode` PyPI package (eoyilmaz/timecode). `extract.py` also needs ffprobe on PATH. Run scripts via `uv run`.",
+      "metadata": {
+        "mediaskills-category": "timecode"
+      },
+      "scripts": [
+        {
+          "script": "analyze_metadata.py",
+          "language": "python",
+          "op": "timecode.analyze_metadata",
+          "pep723_dependencies": [
+            "timecode>=1.5.1"
+          ],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "calculate.py",
+          "language": "python",
+          "op": "timecode.calculate",
+          "pep723_dependencies": [
+            "timecode>=1.5.1"
+          ],
+          "common_flags": [
+            "--timecode",
+            "--fps"
+          ]
+        },
+        {
+          "script": "convert.py",
+          "language": "python",
+          "op": "timecode.convert",
+          "pep723_dependencies": [
+            "timecode>=1.5.1"
+          ],
+          "common_flags": [
+            "--timecode"
+          ]
+        },
+        {
+          "script": "convert_df.py",
+          "language": "python",
+          "op": "timecode.convert_df",
+          "pep723_dependencies": [
+            "timecode>=1.5.1"
+          ],
+          "common_flags": [
+            "--timecode",
+            "--fps"
+          ]
+        },
+        {
+          "script": "detect_format.py",
+          "language": "python",
+          "op": "timecode.detect_format",
+          "pep723_dependencies": [
+            "timecode>=1.5.1"
+          ],
+          "common_flags": [
+            "--timecode",
+            "--fps"
+          ]
+        },
+        {
+          "script": "extract.py",
+          "language": "python",
+          "op": "timecode.extract",
+          "pep723_dependencies": [
+            "timecode>=1.5.1"
+          ],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "from_seconds.py",
+          "language": "python",
+          "op": "timecode.from_seconds",
+          "pep723_dependencies": [
+            "timecode>=1.5.1"
+          ],
+          "common_flags": [
+            "--fps"
+          ]
+        },
+        {
+          "script": "info.py",
+          "language": "python",
+          "op": null,
+          "pep723_dependencies": [
+            "timecode>=1.5.1"
+          ],
+          "common_flags": []
+        },
+        {
+          "script": "to_seconds.py",
+          "language": "python",
+          "op": "timecode.to_seconds",
+          "pep723_dependencies": [
+            "timecode>=1.5.1"
+          ],
+          "common_flags": [
+            "--timecode",
+            "--fps"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "video-transformation",
+      "description": "Transform video with ffmpeg \u2014 trim, concatenate, transcode, scale, proxy, extract frames and audio, create GIFs, replace audio tracks, and other stream manipulation. Use when changing video files through editing cuts, codec conversion, resizing, muxing, or derivative exports.",
+      "license": "MIT",
+      "compatibility": "Requires ffmpeg and ffprobe on PATH. Scripts are Python 3.11+, run via `uv run` (no separate install step).",
+      "metadata": {
+        "mediaskills-category": "video"
+      },
+      "scripts": [
+        {
+          "script": "concat.py",
+          "language": "python",
+          "op": "video.concat",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--output"
+          ]
+        },
+        {
+          "script": "extract_audio.py",
+          "language": "python",
+          "op": "video.extract_audio",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "extract_frame.py",
+          "language": "python",
+          "op": "video.extract_frame",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "info.py",
+          "language": "python",
+          "op": null,
+          "pep723_dependencies": [],
+          "common_flags": []
+        },
+        {
+          "script": "proxy.py",
+          "language": "python",
+          "op": "video.proxy",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "replace_audio.py",
+          "language": "python",
+          "op": "video.replace_audio",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "scale.py",
+          "language": "python",
+          "op": "video.scale",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "to_gif.py",
+          "language": "python",
+          "op": "video.to_gif",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "transcode.py",
+          "language": "python",
+          "op": "video.transcode",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "trim.py",
+          "language": "python",
+          "op": "video.trim",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "trim_multi.py",
+          "language": "python",
+          "op": "video.trim_multi",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "vision-analysis",
+      "description": "Interval-based and shot-level visual analysis \u2014 extract frame sequences, guide agent vision analysis of stills, classified on-screen text, and QC-style reports. Use for burned-in subtitles, graphics, title cards, and timecoded text inventories. Does not bundle a vision model; the agent analyzes images with its own capabilities.",
+      "license": "MIT",
+      "compatibility": "Requires Python 3.11+, ffmpeg/ffprobe. compile_report.py also needs tesseract. No local vision model or Ollama required \u2014 frame image analysis is performed by the agent using the skill. Run scripts via `uv run`.",
+      "metadata": {
+        "mediaskills-category": "vision"
+      },
+      "scripts": [
+        {
+          "script": "analysis_schema.py",
+          "language": "python",
+          "op": "vision.analysis_schema",
+          "pep723_dependencies": [],
+          "common_flags": []
+        },
+        {
+          "script": "compile_all_reports.py",
+          "language": "python",
+          "op": "vision.compile_all_reports",
+          "pep723_dependencies": [],
+          "common_flags": []
+        },
+        {
+          "script": "compile_report.py",
+          "language": "python",
+          "op": "vision.compile_report",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "extract_interval_frames.py",
+          "language": "python",
+          "op": "vision.extract_interval_frames",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "extract_title_text.py",
+          "language": "python",
+          "op": "vision.extract_title_text",
+          "pep723_dependencies": [],
+          "common_flags": []
+        },
+        {
+          "script": "forced_narrative_report.py",
+          "language": "python",
+          "op": "vision.forced_narrative_report",
+          "pep723_dependencies": [],
+          "common_flags": []
+        },
+        {
+          "script": "get_frame_batch.py",
+          "language": "python",
+          "op": "vision.get_frame_batch",
+          "pep723_dependencies": [],
+          "common_flags": []
+        },
+        {
+          "script": "graphics_on_screen_report.py",
+          "language": "python",
+          "op": "vision.graphics_on_screen_report",
+          "pep723_dependencies": [],
+          "common_flags": []
+        },
+        {
+          "script": "list_extractions.py",
+          "language": "python",
+          "op": "vision.list_extractions",
+          "pep723_dependencies": [],
+          "common_flags": []
+        },
+        {
+          "script": "merge_analysis.py",
+          "language": "python",
+          "op": "vision.merge_analysis",
+          "pep723_dependencies": [],
+          "common_flags": []
+        },
+        {
+          "script": "prepare_manifest.py",
+          "language": "python",
+          "op": "vision.prepare_manifest",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
+          "script": "text_on_screen_report.py",
+          "language": "python",
+          "op": "vision.text_on_screen_report",
+          "pep723_dependencies": [],
+          "common_flags": []
+        },
+        {
+          "script": "validate_analysis.py",
+          "language": "python",
+          "op": "vision.validate_analysis",
+          "pep723_dependencies": [],
+          "common_flags": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+name: Bug report
+description: Script failure or incorrect output
+title: "[bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Run `./scripts/smoke.sh` first. See [SUPPORT.md](../SUPPORT.md).
+  - type: input
+    id: skill
+    attributes:
+      label: Skill name
+      placeholder: inspect
+    validations:
+      required: true
+  - type: input
+    id: script
+    attributes:
+      label: Script
+      placeholder: probe.py
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: JSON stdout / stderr
+      render: shell
+  - type: input
+    id: version
+    attributes:
+      label: mediaskills version or git tag
+      placeholder: v0.1.0

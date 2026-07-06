@@ -1,0 +1,134 @@
+---
+import { SITE } from "../lib/seo";
+import { getCatalog } from "../lib/catalog";
+
+const catalog = getCatalog();
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <strong>mediaskills</strong>
+      <p>Agent Skills for media — video, audio, captions, timecode, and broadcast workflows.</p>
+      <p class="footer-meta">
+        v{catalog.version} · {catalog.skillCount} skills · {catalog.opCount} operations · MIT
+      </p>
+    </div>
+
+    <div class="footer-links">
+      <h4>Explore</h4>
+      <ul>
+        <li><a href="/skills/">All skills</a></li>
+        <li><a href="/cookbooks/">Cookbooks</a></li>
+        <li><a href="/ops/">Operation catalog</a></li>
+        <li><a href="/install/">Install guide</a></li>
+        <li><a href="/about/">About</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-links">
+      <h4>Repository</h4>
+      <ul>
+        <li><a href={SITE.repo}>GitHub</a></li>
+        <li><a href={`${SITE.repo}/blob/master/AGENTS.md`}>Agent routing</a></li>
+        <li><a href={`${SITE.repo}/blob/master/docs/SCRIPT_CONTRACT.md`}>Script contract</a></li>
+        <li><a href={`${SITE.repo}/blob/master/CHANGELOG.md`}>Changelog</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container footer-bottom">
+    <span>
+      © {year}{" "}
+      <a href={SITE.sponsor.url} target="_blank" rel="noopener noreferrer">{SITE.sponsor.name}</a>
+    </span>
+    <a href="https://agentskills.io/specification" target="_blank" rel="noopener">agentskills.io compliant</a>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: 4rem;
+    padding: 3rem 0 2rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg-1);
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .footer-brand strong {
+    color: var(--text-0);
+    font-size: 1.1rem;
+  }
+
+  .footer-brand p {
+    color: var(--text-2);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    max-width: 36ch;
+  }
+
+  .footer-meta {
+    color: var(--text-3) !important;
+    font-size: 0.8125rem !important;
+  }
+
+  .footer-links h4 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+    margin-bottom: 0.75rem;
+  }
+
+  .footer-links ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .footer-links li {
+    margin-bottom: 0.4rem;
+  }
+
+  .footer-links a {
+    color: var(--text-2);
+    font-size: 0.9rem;
+  }
+
+  .footer-links a:hover {
+    color: var(--accent);
+  }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.8125rem;
+    color: var(--text-3);
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .footer-bottom a {
+    color: var(--text-2);
+  }
+
+  .footer-bottom a:hover {
+    color: var(--accent);
+  }
+
+  @media (max-width: 768px) {
+    .footer-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

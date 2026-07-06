@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <rect width="1200" height="630" fill="#06060a"/>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <text x="80" y="280" fill="#f4f4f8" font-family="system-ui,sans-serif" font-size="72" font-weight="700">mediaskills</text>
+  <text x="80" y="360" fill="#9090a8" font-family="system-ui,sans-serif" font-size="36">Agent Skills for media</text>
+  <text x="80" y="480" fill="#00e5b8" font-family="ui-monospace,monospace" font-size="28">13 skills · 80+ ops · MIT</text>
+  <rect x="80" y="520" width="120" height="8" rx="4" fill="url(#accent)"/>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00e5b8" stop-opacity="0.08"/>
+      <stop offset="0.5" stop-color="#06060a" stop-opacity="0"/>
+      <stop offset="1" stop-color="#7c6cff" stop-opacity="0.1"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="80" y1="524" x2="200" y2="524" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00e5b8"/>
+      <stop offset="1" stop-color="#7c6cff"/>
+    </linearGradient>
+  </defs>
+</svg>

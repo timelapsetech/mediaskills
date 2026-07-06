@@ -1,0 +1,150 @@
+---
+import { SITE } from "../lib/seo";
+import { getCatalog } from "../lib/catalog";
+
+const catalog = getCatalog();
+const nav = [
+  { href: "/skills/", label: "Skills" },
+  { href: "/cookbooks/", label: "Cookbooks" },
+  { href: "/ops/", label: "Operations" },
+  { href: "/install/", label: "Install" },
+  { href: "/about/", label: "About" },
+];
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="brand" aria-label="mediaskills home">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-text">mediaskills</span>
+    </a>
+
+    <nav class="nav" aria-label="Primary">
+      {nav.map((item) => (
+        <a href={item.href} class:list={{ active: Astro.url.pathname.startsWith(item.href) }}>
+          {item.label}
+        </a>
+      ))}
+    </nav>
+
+    <div class="header-actions">
+      <button type="button" class="search-trigger btn btn-ghost btn-sm" id="open-search" aria-label="Search (press /)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <path d="M20 20l-3-3" />
+        </svg>
+        <span class="search-label">Search</span>
+        <kbd class="kbd">/</kbd>
+      </button>
+      <a href={SITE.repo} class="btn btn-ghost btn-sm github-link" target="_blank" rel="noopener noreferrer">
+        GitHub
+      </a>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: var(--header-h);
+    background: rgba(6, 6, 10, 0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    height: 100%;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--text-0);
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: -0.02em;
+    flex-shrink: 0;
+  }
+
+  .brand:hover {
+    color: var(--text-0);
+  }
+
+  .brand-mark {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+
+  .nav {
+    display: flex;
+    gap: 0.25rem;
+    flex: 1;
+  }
+
+  .nav a {
+    padding: 0.45rem 0.75rem;
+    border-radius: var(--radius-sm);
+    color: var(--text-2);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .nav a:hover,
+  .nav a.active {
+    color: var(--text-0);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+
+  .search-trigger {
+    gap: 0.4rem;
+  }
+
+  .search-label {
+    display: none;
+  }
+
+  .kbd {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-strong);
+    color: var(--text-3);
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  .github-link {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .search-label {
+      display: inline;
+    }
+    .github-link {
+      display: inline-flex;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .nav {
+      display: none;
+    }
+  }
+</style>

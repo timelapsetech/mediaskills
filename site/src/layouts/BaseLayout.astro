@@ -1,0 +1,99 @@
+---
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import SearchDialog from "../components/SearchDialog.astro";
+import { SITE, pageTitle, canonical, jsonLd } from "../lib/seo";
+import { getCatalog } from "../lib/catalog";
+
+interface Props {
+  title?: string;
+  description?: string;
+  path?: string;
+  ogType?: string;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description = SITE.description,
+  path = "/",
+  ogType = "website",
+  noindex = false,
+} = Astro.props;
+
+const fullTitle = pageTitle(title);
+const url = canonical(path);
+const catalog = getCatalog();
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE.name,
+  url: SITE.url,
+  description: SITE.description,
+  potentialAction: {
+    "@type": "SearchAction",
+    target: `${SITE.url}/skills/?q={search_term_string}`,
+    "query-input": "required name=search_term_string",
+  },
+};
+
+const orgJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  name: "mediaskills",
+  description: SITE.description,
+  codeRepository: SITE.repo,
+  programmingLanguage: "Python",
+  license: "https://opensource.org/licenses/MIT",
+  version: catalog.version,
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="canonical" href={url} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={url} />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:image" content={`${SITE.url}${SITE.ogImage}`} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={`${SITE.url}${SITE.ogImage}`} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script type="application/ld+json" set:html={jsonLd(websiteJsonLd)} />
+    <script type="application/ld+json" set:html={jsonLd(orgJsonLd)} />
+    <slot name="head" />
+  </head>
+  <body>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+    <SearchDialog />
+    <script id="search-index" type="application/json" set:html={JSON.stringify(catalog.searchIndex)} />
+  </body>
+</html>
+
+<style>
+  #main {
+    min-height: calc(100vh - var(--header-h) - 200px);
+  }
+</style>

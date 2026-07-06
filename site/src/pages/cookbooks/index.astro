@@ -1,0 +1,104 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import CookbookCard from "../../components/CookbookCard.astro";
+import { getCatalog } from "../../lib/catalog";
+
+const catalog = getCatalog();
+---
+
+<BaseLayout
+  title="Cookbooks"
+  description="End-to-end mediaskills workflows — multi-skill command sequences for delivery, captions, podcast cleanup, timecode edits, and QC."
+  path="/cookbooks/"
+>
+  <div class="page-hero">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a><span class="sep">/</span><span>Cookbooks</span>
+      </nav>
+      <h1>Workflow cookbooks</h1>
+      <p class="lead">
+        Multi-step pipelines that chain skills together. Each cookbook includes bash sequences, agent notes, and skill routing — probe first, transform second.
+      </p>
+    </div>
+  </div>
+
+  <section class="section section-tight">
+    <div class="container">
+      <div class="grid-cookbooks">
+        {catalog.cookbooks.map((book) => (
+          <CookbookCard cookbook={book} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <h2>How cookbooks work</h2>
+      <div class="how-grid">
+        <div class="how-card">
+          <span class="how-num">1</span>
+          <h3>Route to skills</h3>
+          <p>Each step names a skill and script. Agents install only what they need via <code>npx skills add</code>.</p>
+        </div>
+        <div class="how-card">
+          <span class="how-num">2</span>
+          <h3>Chain JSON outputs</h3>
+          <p>Scripts return <code>output_paths</code> and <code>data</code> fields — pass paths to the next <code>--input</code>.</p>
+        </div>
+        <div class="how-card">
+          <span class="how-num">3</span>
+          <h3>Probe before destructive ops</h3>
+          <p>Start with <code>inspect</code> to confirm duration, codecs, and streams before trimming or transcoding.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section-alt {
+    background: var(--bg-1);
+    border-top: 1px solid var(--border);
+  }
+
+  .how-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .how-card {
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background: var(--bg-2);
+  }
+
+  .how-num {
+    display: inline-flex;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--accent-glow);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .how-card p {
+    color: var(--text-2);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  .how-card code {
+    color: var(--accent);
+    font-size: 0.85em;
+  }
+</style>

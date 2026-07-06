@@ -1,0 +1,21 @@
+name: Agent routing issue
+description: Agent picked wrong skill or misused scripts
+title: "[agent]: "
+labels: ["documentation"]
+body:
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should have happened?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What did the agent do instead?
+    validations:
+      required: true
+  - type: textarea
+    id: fix
+    attributes:
+      label: Suggested SKILL.md or AGENTS.md improvement

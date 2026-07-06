@@ -1,0 +1,219 @@
+
+<dialog id="search-dialog" class="search-dialog" aria-label="Search mediaskills">
+  <div class="search-panel">
+    <div class="search-input-wrap">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="11" cy="11" r="7" />
+        <path d="M20 20l-3-3" />
+      </svg>
+      <input
+        type="search"
+        id="search-input"
+        placeholder="Search skills, recipes, cookbooks, operations…"
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <kbd class="kbd">esc</kbd>
+    </div>
+    <ul id="search-results" class="search-results" role="listbox"></ul>
+    <p class="search-hint">Try <em>trim</em>, <em>captions</em>, <em>timecode</em>, or <em>broadcast</em></p>
+  </div>
+</dialog>
+
+<style is:global>
+  .search-dialog {
+    padding: 0;
+    border: none;
+    background: transparent;
+    max-width: none;
+    max-height: none;
+    width: 100%;
+    height: 100%;
+  }
+
+  .search-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(4px);
+  }
+
+  .search-panel {
+    width: min(640px, calc(100% - 2rem));
+    margin: 12vh auto 0;
+    background: var(--bg-2);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+
+  .search-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-3);
+  }
+
+  #search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-0);
+    font-size: 1rem;
+    font-family: var(--font-sans);
+  }
+
+  #search-input::placeholder {
+    color: var(--text-3);
+  }
+
+  .search-results {
+    list-style: none;
+    margin: 0;
+    padding: 0.5rem;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+
+  .search-results li {
+    margin: 0;
+  }
+
+  .search-results a {
+    display: block;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-sm);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .search-results a:hover,
+  .search-results a:focus-visible,
+  .search-results a.active {
+    background: rgba(0, 229, 184, 0.08);
+    outline: none;
+  }
+
+  .result-title {
+    color: var(--text-0);
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+
+  .result-meta {
+    font-size: 0.75rem;
+    color: var(--text-3);
+    margin-top: 0.15rem;
+  }
+
+  .result-desc {
+    font-size: 0.8125rem;
+    color: var(--text-2);
+    margin-top: 0.25rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .search-hint {
+    padding: 0.75rem 1.25rem;
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--text-3);
+    border-top: 1px solid var(--border);
+  }
+
+  .search-hint em {
+    color: var(--accent);
+    font-style: normal;
+  }
+</style>
+
+<script>
+  function initSearch() {
+    const dialog = document.getElementById("search-dialog");
+    const input = document.getElementById("search-input");
+    const results = document.getElementById("search-results");
+    const openBtn = document.getElementById("open-search");
+    const indexEl = document.getElementById("search-index");
+
+    if (!dialog || !input || !results || !indexEl) return;
+
+    /** @type {Array<{type:string,title:string,subtitle:string,description:string,url:string,keywords:string}>} */
+    const index = JSON.parse(indexEl.textContent || "[]");
+
+    function openSearch() {
+      dialog.showModal();
+      input.value = "";
+      render("");
+      requestAnimationFrame(() => input.focus());
+    }
+
+    function closeSearch() {
+      dialog.close();
+    }
+
+    function score(item, q) {
+      const hay = `${item.title} ${item.subtitle} ${item.description} ${item.keywords}`.toLowerCase();
+      const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+      if (!terms.length) return 1;
+      let s = 0;
+      for (const t of terms) {
+        if (item.title.toLowerCase().includes(t)) s += 4;
+        if (item.subtitle.toLowerCase().includes(t)) s += 2;
+        if (hay.includes(t)) s += 1;
+      }
+      return s;
+    }
+
+    function render(query) {
+      const q = query.trim();
+      const matches = index
+        .map((item) => ({ item, s: score(item, q) }))
+        .filter(({ s }) => s > 0)
+        .sort((a, b) => b.s - a.s)
+        .slice(0, 12);
+
+      if (!matches.length) {
+        results.innerHTML = `<li class="empty-state">No results for “${q}”</li>`;
+        return;
+      }
+
+      results.innerHTML = matches
+        .map(
+          ({ item }) => `
+        <li>
+          <a href="${item.url}">
+            <div class="result-title">${item.title}</div>
+            <div class="result-meta">${item.type} · ${item.subtitle}</div>
+            <div class="result-desc">${item.description}</div>
+          </a>
+        </li>`,
+        )
+        .join("");
+    }
+
+    openBtn?.addEventListener("click", openSearch);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "/" && !["INPUT", "TEXTAREA"].includes(document.activeElement?.tagName ?? "")) {
+        e.preventDefault();
+        openSearch();
+      }
+      if (e.key === "Escape" && dialog.open) {
+        closeSearch();
+      }
+    });
+
+    dialog.addEventListener("click", (e) => {
+      if (e.target === dialog) closeSearch();
+    });
+
+    input.addEventListener("input", () => render(input.value));
+  }
+
+  initSearch();
+</script>

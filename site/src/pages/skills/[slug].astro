@@ -1,0 +1,261 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCatalog, getSkill, getRelatedCookbooks } from "../../lib/catalog";
+import { jsonLd } from "../../lib/seo";
+
+export function getStaticPaths() {
+  const catalog = getCatalog();
+  return catalog.skills.map((skill) => ({
+    params: { slug: skill.name },
+  }));
+}
+
+const { slug } = Astro.params;
+const skill = getSkill(slug!);
+
+if (!skill) {
+  return Astro.redirect("/skills/");
+}
+
+const cookbooks = getRelatedCookbooks(skill.name);
+const description = skill.description;
+
+const skillJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: `mediaskills: ${skill.name}`,
+  description: skill.description,
+  applicationCategory: "DeveloperApplication",
+  operatingSystem: "Cross-platform",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+};
+---
+
+<BaseLayout title={skill.name} description={description} path={`/skills/${skill.name}/`} ogType="article">
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={jsonLd(skillJsonLd)} />
+  </Fragment>
+
+  <div class="page-hero">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a><span class="sep">/</span>
+        <a href="/skills/">Skills</a><span class="sep">/</span>
+        <span><code>{skill.name}</code></span>
+      </nav>
+      <div class="hero-meta">
+        <span class="pill">{skill.categoryLabel}</span>
+        <span class="pill">{skill.opCount} operations</span>
+        {skill.binaries.length > 0 && <span class="pill">Requires {skill.binaries.join(", ")}</span>}
+      </div>
+      <h1><code>{skill.name}</code></h1>
+      <p class="lead">{skill.description}</p>
+      <div class="hero-actions">
+        <a href={`https://github.com/timelapsetech/mediaskills/tree/master/${skill.githubPath}`} class="btn btn-ghost btn-sm" target="_blank" rel="noopener">View on GitHub</a>
+        <a href="/install/" class="btn btn-primary btn-sm">Install skill</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="section section-tight">
+    <div class="container content-layout">
+      <aside class="sidebar">
+        <nav class="sidebar-nav" aria-label="On this page">
+          <a href="#overview">Overview</a>
+          {skill.recipes.length > 0 && <a href="#recipes">Recipes ({skill.recipes.length})</a>}
+          <a href="#operations">Operations</a>
+          {skill.doNotUseFor.length > 0 && <a href="#boundaries">Boundaries</a>}
+          {cookbooks.length > 0 && <a href="#cookbooks">Related cookbooks</a>}
+        </nav>
+
+        <div class="install-box">
+          <h4>Install</h4>
+          <pre class="code-block"><code>npx skills add timelapsetech/mediaskills@v0.1.0 --skill {skill.name}</code></pre>
+        </div>
+      </aside>
+
+      <div class="main-content">
+        <section id="overview">
+          <h2>Overview</h2>
+          <p>{skill.compatibility}</p>
+        </section>
+
+        {skill.recipes.length > 0 && (
+          <section id="recipes">
+            <h2>Recipes</h2>
+            <p class="section-intro">Copy-paste command sequences agents can run via <code>uv run</code>.</p>
+            {skill.recipes.map((recipe) => (
+              <details class="accordion" id={`recipe-${recipe.id}`} open={skill.recipes.length <= 3}>
+                <summary>{recipe.title}</summary>
+                <div class="accordion-content">
+                  {recipe.commands.map((cmd) => (
+                    <pre class="code-block"><code>{cmd}</code></pre>
+                  ))}
+                  {recipe.examples.map((ex) => (
+                    <details class="accordion nested">
+                      <summary>Example JSON output</summary>
+                      <div class="accordion-content">
+                        <pre class="code-block"><code>{ex}</code></pre>
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              </details>
+            ))}
+          </section>
+        )}
+
+        <section id="operations">
+          <h2>Operations</h2>
+          <p class="section-intro">Each script returns structured JSON — see the <a href="https://github.com/timelapsetech/mediaskills/blob/master/docs/SCRIPT_CONTRACT.md">script contract</a>.</p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Op ID</th>
+                  <th>Script</th>
+                  <th>Common flags</th>
+                </tr>
+              </thead>
+              <tbody>
+                {skill.ops.filter((op) => op.op).map((op) => (
+                  <tr id={op.op!.replace(/\./g, "-")}>
+                    <td><code>{op.op}</code></td>
+                    <td><code>{op.script}</code></td>
+                    <td>{op.common_flags?.join(", ") || "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {skill.doNotUseFor.length > 0 && (
+          <section id="boundaries">
+            <h2>Do not use for</h2>
+            <ul class="prose boundary-list">
+              {skill.doNotUseFor.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {cookbooks.length > 0 && (
+          <section id="cookbooks">
+            <h2>Related cookbooks</h2>
+            <ul class="cookbook-links">
+              {cookbooks.map((book) => (
+                <li><a href={`/cookbooks/${book.slug}/`}>{book.title}</a></li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+  }
+
+  h1 code {
+    color: var(--accent);
+    background: none;
+    font-size: inherit;
+  }
+
+  .content-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 3rem;
+    align-items: start;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: calc(var(--header-h) + 1rem);
+  }
+
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .sidebar-nav a {
+    color: var(--text-2);
+    font-size: 0.875rem;
+    padding: 0.35rem 0;
+  }
+
+  .sidebar-nav a:hover {
+    color: var(--accent);
+  }
+
+  .install-box h4 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+    margin-bottom: 0.5rem;
+  }
+
+  .install-box pre {
+    font-size: 0.7rem;
+  }
+
+  .main-content section {
+    margin-bottom: 3rem;
+  }
+
+  .section-intro {
+    color: var(--text-2);
+    margin-bottom: 1rem;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+
+  .boundary-list {
+    color: var(--warn);
+  }
+
+  .cookbook-links {
+    list-style: none;
+    padding: 0;
+  }
+
+  .cookbook-links li {
+    margin-bottom: 0.5rem;
+  }
+
+  details.nested {
+    margin-top: 0.75rem;
+    background: var(--bg-1);
+  }
+
+  @media (max-width: 900px) {
+    .content-layout {
+      grid-template-columns: 1fr;
+    }
+    .sidebar {
+      position: static;
+    }
+  }
+</style>

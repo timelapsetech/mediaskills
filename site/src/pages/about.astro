@@ -1,0 +1,332 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE } from "../lib/seo";
+
+const contributeLinks = [
+  {
+    title: "Report a bug",
+    description: "Something broken? Wrong output, missing binary, or docs that don't match behavior.",
+    href: `${SITE.repo}/issues/new?template=bug_report.yml`,
+  },
+  {
+    title: "Request a skill",
+    description: "Need a workflow or operation we don't cover yet? Tell us what your agents struggle with.",
+    href: `${SITE.repo}/issues/new?template=skill_request.yml`,
+  },
+  {
+    title: "Suggest routing improvements",
+    description: "Help agents pick the right skill — when-to-use boundaries, cookbooks, or AGENTS.md.",
+    href: `${SITE.repo}/issues/new?template=agent_routing.yml`,
+  },
+  {
+    title: "Contribute code",
+    description: "Pull requests welcome. See CONTRIBUTING.md for smoke tests and skill conventions.",
+    href: `${SITE.repo}/blob/master/CONTRIBUTING.md`,
+  },
+];
+---
+
+<BaseLayout
+  title="About"
+  description="mediaskills is open-source Agent Skills for media, built by media professionals for the media community — a first step toward more media-aware AI tools."
+  path="/about/"
+>
+  <div class="page-hero">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a><span class="sep">/</span><span>About</span>
+      </nav>
+      <p class="eyebrow">By media people, for media people</p>
+      <h1>Building media-aware tools for the agent era</h1>
+      <p class="lead">
+        mediaskills is open source because the media community deserves agent tooling that speaks our language —
+        timecode, loudness, captions, deliverables, and the messy reality of real files.
+      </p>
+    </div>
+  </div>
+
+  <section class="section section-tight">
+    <div class="container about-layout">
+      <article class="prose-block">
+        <h2>Made by media professionals</h2>
+        <p>
+          We're editors, engineers, and operators who've lived inside NLEs, ffmpeg logs, caption pipelines, and
+          delivery specs. mediaskills isn't a generic "AI wrapper" — it's practical infrastructure: deterministic
+          scripts, stable operation IDs, and cookbooks that mirror how media work actually gets done.
+        </p>
+        <p>
+          Every skill is designed so an agent can <strong>probe before it cuts</strong>, <strong>chain outputs
+          between steps</strong>, and <strong>know when not to use a tool</strong>. That's the bar we hold ourselves to.
+        </p>
+      </article>
+
+      <aside class="aside-card" aria-label="Project values">
+        <h3>What we believe</h3>
+        <ul>
+          <li>Media workflows are specialized — generic tools miss the details.</li>
+          <li>Agents need guardrails, not guesswork, around codecs and timecode.</li>
+          <li>Open source helps everyone ship faster and audit what runs on their masters.</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container content-narrow">
+      <h2>We're all building with AI agents now</h2>
+      <p>
+        Assistants are becoming part of the edit bay, the QC pass, and the delivery checklist. But most agent tooling
+        still treats video like any other file — no drop-frame math, no caption compliance heuristics, no instinct for
+        when to copy streams vs re-encode.
+      </p>
+      <p>
+        <strong>mediaskills is a first step.</strong> It packages media literacy into portable
+        <a href="https://agentskills.io/specification">Agent Skills</a> that any compatible agent can install:
+        inspect a master, trim on timecode, normalize a podcast, validate captions, export SCC. The catalog will grow
+        with the community — this is the foundation, not the ceiling.
+      </p>
+
+      <div class="vision-grid">
+        <div class="vision-card">
+          <h3>Today</h3>
+          <p>13 skills, 80+ operations, cookbooks for common delivery and QC paths.</p>
+        </div>
+        <div class="vision-card">
+          <h3>Tomorrow</h3>
+          <p>More broadcast formats, deeper vision workflows, and skills you help define.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-tight">
+    <div class="container content-narrow">
+      <h2>Open source for the media community</h2>
+      <p>
+        mediaskills is MIT-licensed and maintained in the open at
+        <a href={SITE.repo}>timelapsetech/mediaskills</a>. We built it to support editors, engineers, post houses,
+        indies, and anyone automating media with agents — not to lock capabilities behind a walled garden.
+      </p>
+      <p>
+        If mediaskills saves you time on a deliverable, teaches an agent something useful, or sparks an idea for a
+        skill we should add — we want to hear from you.
+      </p>
+
+      <div class="sponsor-card">
+        <h3>Supported by {SITE.sponsor.name}</h3>
+        <p>
+          <a href={SITE.sponsor.url} target="_blank" rel="noopener noreferrer">{SITE.sponsor.name}</a> backs
+          mediaskills.ai and the open-source project so the community can rely on them long term. This site and the
+          skills catalog will stay <strong>free forever</strong> — no paywalls, no gated features on the open catalog.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section contribute-section">
+    <div class="container">
+      <div class="section-header">
+        <h2>Contributions welcome</h2>
+        <p>
+          Found a bug? Need a skill we don't have? Open an issue or send a PR. No contribution is too small — doc
+          fixes, recipes, and new scripts all matter.
+        </p>
+      </div>
+
+      <div class="contribute-grid">
+        {contributeLinks.map((link) => (
+          <a href={link.href} class="card card-interactive contribute-card" target="_blank" rel="noopener noreferrer">
+            <h3>{link.title}</h3>
+            <p>{link.description}</p>
+            <span class="link-arrow" aria-hidden="true">→</span>
+          </a>
+        ))}
+      </div>
+
+      <div class="cta-row">
+        <a href={`${SITE.repo}/issues`} class="btn btn-primary">View all issues</a>
+        <a href="/skills/" class="btn btn-ghost">Explore skills</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .eyebrow {
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+  }
+
+  .about-layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 2.5rem;
+    align-items: start;
+  }
+
+  .prose-block p {
+    color: var(--text-2);
+    font-size: 1.0625rem;
+    max-width: 62ch;
+  }
+
+  .prose-block strong {
+    color: var(--text-0);
+  }
+
+  .aside-card {
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    background: var(--bg-2);
+  }
+
+  .aside-card h3 {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-3);
+    margin-bottom: 1rem;
+  }
+
+  .aside-card ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: var(--text-2);
+    font-size: 0.9375rem;
+  }
+
+  .aside-card li {
+    margin-bottom: 0.6rem;
+  }
+
+  .section-alt {
+    background: var(--bg-1);
+    border-block: 1px solid var(--border);
+  }
+
+  .content-narrow {
+    max-width: 720px;
+  }
+
+  .content-narrow p {
+    color: var(--text-2);
+    font-size: 1.0625rem;
+  }
+
+  .vision-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .vision-card {
+    padding: 1.25rem 1.5rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--bg-2);
+  }
+
+  .vision-card h3 {
+    color: var(--accent);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.5rem;
+  }
+
+  .vision-card p {
+    margin: 0;
+    font-size: 0.9375rem !important;
+  }
+
+  .sponsor-card {
+    margin-top: 2rem;
+    padding: 1.5rem 1.75rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(0, 229, 184, 0.2);
+    background:
+      radial-gradient(ellipse 80% 80% at 0% 0%, var(--accent-glow), transparent),
+      var(--bg-2);
+  }
+
+  .sponsor-card h3 {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .sponsor-card p {
+    margin: 0;
+    color: var(--text-2);
+    font-size: 1rem;
+  }
+
+  .sponsor-card strong {
+    color: var(--text-0);
+  }
+
+  .contribute-section {
+    padding-bottom: 2rem;
+  }
+
+  .contribute-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .contribute-card {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    position: relative;
+    padding: 1.5rem;
+  }
+
+  .contribute-card:hover {
+    color: inherit;
+  }
+
+  .contribute-card h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.0625rem;
+  }
+
+  .contribute-card p {
+    color: var(--text-2);
+    font-size: 0.9rem;
+    margin: 0;
+    padding-right: 1.5rem;
+  }
+
+  .link-arrow {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.25rem;
+    color: var(--text-3);
+    transition: transform 0.15s ease, color 0.15s ease;
+  }
+
+  .contribute-card:hover .link-arrow {
+    transform: translateX(3px);
+    color: var(--accent);
+  }
+
+  .cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  @media (max-width: 900px) {
+    .about-layout {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

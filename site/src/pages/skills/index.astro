@@ -1,0 +1,99 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import SkillCard from "../../components/SkillCard.astro";
+import { getCatalog } from "../../lib/catalog";
+
+const catalog = getCatalog();
+const initialCategory = Astro.url.searchParams.get("category") ?? "all";
+const initialQuery = Astro.url.searchParams.get("q") ?? "";
+---
+
+<BaseLayout
+  title="Skills"
+  description={`Browse all ${catalog.skillCount} mediaskills Agent Skills — video, audio, captions, timecode, vision, and setup.`}
+  path="/skills/"
+>
+  <div class="page-hero">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a><span class="sep">/</span><span>Skills</span>
+      </nav>
+      <h1>Skills catalog</h1>
+      <p class="lead">
+        Portable Agent Skills with deterministic scripts, JSON contracts, and recipes. Filter by category or search with <kbd class="inline-kbd">/</kbd>.
+      </p>
+      <div class="stats" style="margin-top: 1.5rem">
+        <div class="stat"><span class="stat-value">{catalog.skillCount}</span><span class="stat-label">Skills</span></div>
+        <div class="stat"><span class="stat-value">{catalog.opCount}</span><span class="stat-label">Operations</span></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="section section-tight">
+    <div class="container">
+      <div class="filter-bar" id="category-filters" role="tablist" aria-label="Filter by category">
+        <button type="button" class="filter-btn active" data-category="all">All</button>
+        {catalog.categories.map((cat) => (
+          <button type="button" class="filter-btn" data-category={cat.id}>
+            {cat.label} ({cat.skillCount})
+          </button>
+        ))}
+      </div>
+
+      <div class="grid-skills" id="skills-grid">
+        {catalog.skills.map((skill) => (
+          <SkillCard skill={skill} />
+        ))}
+      </div>
+
+      <p id="no-skills" class="empty-state" hidden>No skills match this filter.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<script define:vars={{ initialCategory, initialQuery }}>
+  const grid = document.getElementById("skills-grid");
+  const noSkills = document.getElementById("no-skills");
+  const buttons = document.querySelectorAll("#category-filters .filter-btn");
+  let active = initialCategory;
+
+  function applyFilter(category) {
+    active = category;
+    let visible = 0;
+    grid?.querySelectorAll(".skill-card").forEach((card) => {
+      const match = category === "all" || card.dataset.category === category;
+      card.style.display = match ? "" : "none";
+      if (match) visible++;
+    });
+    buttons.forEach((btn) => btn.classList.toggle("active", btn.dataset.category === category));
+    if (noSkills) noSkills.hidden = visible > 0;
+  }
+
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", () => applyFilter(btn.dataset.category));
+  });
+
+  applyFilter(initialCategory);
+
+  if (initialQuery) {
+    document.getElementById("open-search")?.click();
+    requestAnimationFrame(() => {
+      const input = document.getElementById("search-input");
+      if (input) {
+        input.value = initialQuery;
+        input.dispatchEvent(new Event("input"));
+      }
+    });
+  }
+</script>
+
+<style>
+  .inline-kbd {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-strong);
+    background: var(--bg-2);
+  }
+</style>

@@ -1,0 +1,138 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCatalog, getCookbook } from "../../lib/catalog";
+import { jsonLd } from "../../lib/seo";
+
+export function getStaticPaths() {
+  const catalog = getCatalog();
+  return catalog.cookbooks.map((book) => ({
+    params: { slug: book.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const book = getCookbook(slug!);
+
+if (!book) {
+  return Astro.redirect("/cookbooks/");
+}
+
+const howToJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  name: book.title,
+  description: book.summary,
+  step: book.steps.flatMap((block, i) =>
+    block.split("\n").filter((l) => l.trim() && !l.startsWith("#")).slice(0, 1).map((line) => ({
+      "@type": "HowToStep",
+      position: i + 1,
+      text: line.trim(),
+    })),
+  ),
+};
+---
+
+<BaseLayout title={book.title} description={book.summary} path={`/cookbooks/${book.slug}/`} ogType="article">
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={jsonLd(howToJsonLd)} />
+  </Fragment>
+
+  <div class="page-hero">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a><span class="sep">/</span>
+        <a href="/cookbooks/">Cookbooks</a><span class="sep">/</span>
+        <span>{book.title}</span>
+      </nav>
+      <span class="pill pill-accent">Cookbook</span>
+      <h1>{book.title}</h1>
+      <p class="lead">{book.summary}</p>
+      {book.skillsChain && <p class="chain"><strong>Skills:</strong> {book.skillsChain}</p>}
+    </div>
+  </div>
+
+  <section class="section section-tight">
+    <div class="container content-narrow">
+      <h2>Steps</h2>
+      {book.steps.map((block, i) => (
+        <details class="accordion" open={i === 0}>
+          <summary>Step {i + 1}{block.includes("cd skills/") ? ` — ${block.match(/cd skills\/([^\n]+)/)?.[1] ?? "commands"}` : ""}</summary>
+          <div class="accordion-content">
+            <pre class="code-block"><code>{block}</code></pre>
+          </div>
+        </details>
+      ))}
+
+      {book.optional && (
+        <section class="optional">
+          <h2>Optional steps</h2>
+          <div class="prose" set:html={book.optional.replace(/\n/g, "<br/>").replace(/- /g, "• ")} />
+        </section>
+      )}
+
+      {book.agentNotes && (
+        <section class="agent-notes">
+          <h2>Agent notes</h2>
+          <ul class="prose">
+            {book.agentNotes.split("\n").filter((l) => l.startsWith("- ")).map((line) => (
+              <li>{line.replace(/^- /, "")}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <div class="related-skills">
+        <h2>Skills in this workflow</h2>
+        <div class="skill-chips">
+          {book.relatedSkills.map((name) => (
+            <a href={`/skills/${name}/`} class="skill-chip"><code>{name}</code></a>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .chain {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--text-2);
+    margin-top: 1rem;
+  }
+
+  .content-narrow {
+    max-width: 800px;
+  }
+
+  .optional,
+  .agent-notes,
+  .related-skills {
+    margin-top: 2.5rem;
+  }
+
+  .agent-notes li {
+    color: var(--text-2);
+    margin-bottom: 0.5rem;
+  }
+
+  .skill-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+
+  .skill-chip {
+    padding: 0.4rem 0.75rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--bg-2);
+    color: var(--accent);
+    font-size: 0.875rem;
+  }
+
+  .skill-chip:hover {
+    border-color: rgba(0, 229, 184, 0.3);
+  }
+</style>

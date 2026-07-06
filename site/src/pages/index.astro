@@ -1,0 +1,222 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/Hero.astro";
+import SkillCard from "../components/SkillCard.astro";
+import CookbookCard from "../components/CookbookCard.astro";
+import { getCatalog } from "../lib/catalog";
+import { SITE } from "../lib/seo";
+
+const catalog = getCatalog();
+const featuredSkills = catalog.skills.slice(0, 6);
+const featuredCookbooks = catalog.cookbooks.slice(0, 3);
+
+const intents = [
+  { label: "Probe a file", href: "/skills/inspect/", icon: "🔍" },
+  { label: "Cut & transcode", href: "/skills/video-transformation/", icon: "🎬" },
+  { label: "Speech → captions", href: "/cookbooks/broadcast-captions/", icon: "💬" },
+  { label: "Timecode math", href: "/skills/timecode/", icon: "⏱" },
+  { label: "On-screen text QC", href: "/cookbooks/qc-on-screen-text/", icon: "👁" },
+  { label: "Install tools", href: "/skills/install-media-tools/", icon: "🔧" },
+];
+---
+
+<BaseLayout path="/">
+  <Hero />
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2>What do you want to do?</h2>
+        <p>Jump straight to common agent tasks — or press <kbd class="inline-kbd">/</kbd> to search everything.</p>
+      </div>
+      <div class="intent-grid">
+        {intents.map((item) => (
+          <a href={item.href} class="intent-card">
+            <span class="intent-icon" aria-hidden="true">{item.icon}</span>
+            <span>{item.label}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <div class="section-header row-header">
+        <div>
+          <h2>Skills by category</h2>
+          <p>Each skill ships with SKILL.md routing, recipes, and JSON-scripted operations for agents.</p>
+        </div>
+        <a href="/skills/" class="btn btn-ghost btn-sm">View all {catalog.skillCount} skills →</a>
+      </div>
+
+      <div class="category-strip">
+        {catalog.categories.map((cat) => (
+          <a href={`/skills/?category=${cat.id}`} class="category-chip">
+            <span class="cat-label">{cat.label}</span>
+            <span class="cat-count">{cat.skillCount}</span>
+          </a>
+        ))}
+      </div>
+
+      <div class="grid-skills">
+        {featuredSkills.map((skill) => (
+          <SkillCard skill={skill} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-header row-header">
+        <div>
+          <h2>End-to-end cookbooks</h2>
+          <p>Multi-skill workflows with command sequences agents can chain — probe first, transform second.</p>
+        </div>
+        <a href="/cookbooks/" class="btn btn-ghost btn-sm">All cookbooks →</a>
+      </div>
+      <div class="grid-cookbooks">
+        {featuredCookbooks.map((book) => (
+          <CookbookCard cookbook={book} />
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-tight cta-section">
+    <div class="container cta-card">
+      <div>
+        <h2>Install in one command</h2>
+        <p>Pin a version for reproducible agent environments. Start with <code>install-media-tools</code> and <code>doctor.sh</code>.</p>
+      </div>
+      <pre class="code-block"><code>{catalog.install.commands.one}</code></pre>
+      <a href="/install/" class="btn btn-primary">Full install guide</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .section-alt {
+    background: var(--bg-1);
+    border-block: 1px solid var(--border);
+  }
+
+  .row-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .inline-kbd {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-strong);
+    background: var(--bg-2);
+    color: var(--text-2);
+  }
+
+  .intent-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .intent-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 1rem 1.1rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--bg-2);
+    color: var(--text-0);
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.15s ease;
+  }
+
+  .intent-card:hover {
+    border-color: rgba(0, 229, 184, 0.25);
+    background: rgba(0, 229, 184, 0.05);
+    color: var(--text-0);
+    transform: translateY(-1px);
+  }
+
+  .intent-icon {
+    font-size: 1.25rem;
+  }
+
+  .category-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .category-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bg-2);
+    color: var(--text-1);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .category-chip:hover {
+    border-color: rgba(0, 229, 184, 0.3);
+    color: var(--accent);
+  }
+
+  .cat-count {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-3);
+  }
+
+  .cta-section {
+    padding-bottom: 2rem;
+  }
+
+  .cta-card {
+    display: grid;
+    gap: 1.25rem;
+    padding: 2rem;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-strong);
+    background:
+      radial-gradient(ellipse 60% 80% at 100% 0%, var(--accent-glow), transparent),
+      var(--bg-2);
+  }
+
+  .cta-card p {
+    color: var(--text-2);
+    margin: 0;
+  }
+
+  .cta-card code {
+    color: var(--accent);
+  }
+
+  @media (min-width: 768px) {
+    .cta-card {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+    }
+    .cta-card pre {
+      grid-column: 1 / -1;
+    }
+    .cta-card .btn {
+      justify-self: start;
+    }
+  }
+</style>

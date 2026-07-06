@@ -1,0 +1,75 @@
+---
+import type { Skill } from "../lib/catalog";
+
+interface Props {
+  skill: Skill;
+}
+
+const { skill } = Astro.props;
+const href = `/skills/${skill.name}/`;
+---
+
+<a href={href} class="card card-interactive skill-card" data-category={skill.category}>
+  <div class="card-top">
+    <span class="pill">{skill.categoryLabel}</span>
+    <span class="op-count">{skill.opCount} ops</span>
+  </div>
+  <div class="card-body">
+    <h3><code>{skill.name}</code></h3>
+    <p>{skill.description}</p>
+    {skill.recipes.length > 0 && (
+      <span class="recipe-hint">{skill.recipes.length} recipe{skill.recipes.length === 1 ? "" : "s"}</span>
+    )}
+  </div>
+</a>
+
+<style>
+  .skill-card {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    height: 100%;
+  }
+
+  .skill-card:hover {
+    color: inherit;
+  }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem 0;
+  }
+
+  .op-count {
+    font-size: 0.75rem;
+    color: var(--text-3);
+    font-family: var(--font-mono);
+  }
+
+  .skill-card h3 {
+    margin-bottom: 0.5rem;
+  }
+
+  .skill-card h3 code {
+    font-size: 1rem;
+    color: var(--accent);
+    background: none;
+  }
+
+  .skill-card p {
+    font-size: 0.9rem;
+    color: var(--text-2);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+  }
+
+  .recipe-hint {
+    font-size: 0.75rem;
+    color: var(--text-3);
+  }
+</style>

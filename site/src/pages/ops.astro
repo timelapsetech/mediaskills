@@ -1,0 +1,143 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getCatalog } from "../lib/catalog";
+
+const catalog = getCatalog();
+const byCategory = catalog.categories.map((cat) => ({
+  ...cat,
+  ops: catalog.ops.filter((o) => o.category === cat.id),
+}));
+---
+
+<BaseLayout
+  title="Operations"
+  description={`Searchable catalog of ${catalog.opCount} mediaskills operation IDs — inspect.probe, video.trim, timecode.convert, and more.`}
+  path="/ops/"
+>
+  <div class="page-hero">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Home</a><span class="sep">/</span><span>Operations</span>
+      </nav>
+      <h1>Operation catalog</h1>
+      <p class="lead">
+        Every script exposes a stable <code>op</code> ID in JSON responses. Filter by category or search with <kbd class="inline-kbd">/</kbd>.
+      </p>
+      <input type="search" id="op-search" class="op-search" placeholder="Filter operations… e.g. trim, validate, probe" aria-label="Filter operations" />
+    </div>
+  </div>
+
+  <section class="section section-tight">
+    <div class="container">
+      {byCategory.map((group) => (
+        group.ops.length > 0 && (
+          <div class="op-group" data-category={group.id}>
+            <h2>{group.label} <span class="count">({group.ops.length})</span></h2>
+            <div class="table-wrap">
+              <table class="data-table op-table">
+                <thead>
+                  <tr>
+                    <th>Op ID</th>
+                    <th>Skill</th>
+                    <th>Script</th>
+                    <th>Flags</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {group.ops.map((op) => (
+                    <tr data-search={`${op.op} ${op.skill} ${op.script} ${(op.common_flags ?? []).join(" ")}`} id={op.op.replace(/\./g, "-")}>
+                      <td><a href={`/skills/${op.skill}/#${op.op.replace(/\./g, "-")}`}><code>{op.op}</code></a></td>
+                      <td><a href={`/skills/${op.skill}/`}>{op.skill}</a></td>
+                      <td><code>{op.script}</code></td>
+                      <td class="flags">{(op.common_flags ?? []).join(", ") || "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )
+      ))}
+      <p id="no-ops" class="empty-state" hidden>No operations match your filter.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const input = document.getElementById("op-search");
+  const noOps = document.getElementById("no-ops");
+
+  input?.addEventListener("input", () => {
+    const q = input.value.trim().toLowerCase();
+    let visible = 0;
+
+    document.querySelectorAll(".op-table tbody tr").forEach((row) => {
+      const hay = row.dataset.search?.toLowerCase() ?? "";
+      const match = !q || hay.includes(q);
+      row.style.display = match ? "" : "none";
+      if (match) visible++;
+    });
+
+    document.querySelectorAll(".op-group").forEach((group) => {
+      const rows = group.querySelectorAll("tbody tr");
+      const anyVisible = [...rows].some((r) => r.style.display !== "none");
+      group.style.display = anyVisible ? "" : "none";
+    });
+
+    if (noOps) noOps.hidden = visible > 0;
+  });
+</script>
+
+<style>
+  .inline-kbd {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    border: 1px solid var(--border-strong);
+    background: var(--bg-2);
+  }
+
+  .op-search {
+    width: min(480px, 100%);
+    margin-top: 1.25rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-strong);
+    background: var(--bg-2);
+    color: var(--text-0);
+    font-size: 1rem;
+    font-family: var(--font-sans);
+  }
+
+  .op-search:focus {
+    outline: 2px solid var(--accent-glow);
+    border-color: rgba(0, 229, 184, 0.4);
+  }
+
+  .op-group {
+    margin-bottom: 2.5rem;
+  }
+
+  .op-group h2 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .count {
+    color: var(--text-3);
+    font-weight: 400;
+    font-size: 0.9em;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+  }
+
+  .flags {
+    color: var(--text-3);
+    font-size: 0.8125rem;
+  }
+</style>

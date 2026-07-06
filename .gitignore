@@ -1,0 +1,16 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+.netlify/
+data/
+.mediaskills/
+
+# Ignore loose media in repo root; allow committed test fixtures
+*.mp4
+*.wav
+*.jpg
+*.png
+!tests/fixtures/**
