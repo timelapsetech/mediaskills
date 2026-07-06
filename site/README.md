@@ -27,14 +27,30 @@ npm run preview
 
 Pushes to `main`/`master` that touch `site/`, `skills/`, or `docs/workflows/` trigger [`.github/workflows/deploy-site.yml`](../.github/workflows/deploy-site.yml).
 
-### Custom domain setup
+**Build must use GitHub Actions** (not “Deploy from a branch”) under **Settings → Pages → Build and deployment**.
 
-1. In the GitHub repo: **Settings → Pages → Build and deployment** → Source: **GitHub Actions**
-2. **Custom domain:** `mediaskills.ai` (CNAME file is in `public/CNAME`)
-3. At your DNS provider, add:
-   - `A` records → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
-   - or `CNAME` `www` → `<user>.github.io` if using www subdomain
-4. Enable **Enforce HTTPS** after DNS propagates
+### If deploy fails with “Deployment failed, try again later”
+
+The Astro **build** usually succeeds; the **deploy** step fails when GitHub Pages cannot publish. Common causes:
+
+1. **Custom domain added before the first successful deploy** — In **Settings → Pages**, temporarily clear the custom domain, re-run the workflow, confirm `https://timelapsetech.github.io/mediaskills/` works, then add `mediaskills.ai` back.
+2. **DNS not pointed at GitHub Pages** — `mediaskills.ai` must resolve to GitHub, not only Cloudflare. Check with `dig mediaskills.ai +short`.
+3. **Cloudflare proxy** — During initial setup, use **DNS only** (grey cloud) or point apex/www at GitHub correctly before enabling the orange proxy.
+
+### Custom domain (`mediaskills.ai`)
+
+Configure the domain in **Settings → Pages → Custom domain** (not via a `CNAME` file in this repo — workflow deploys ignore it).
+
+At your DNS provider (Cloudflare example):
+
+| Type | Name | Target | Proxy |
+| --- | --- | --- | --- |
+| `CNAME` | `www` | `timelapsetech.github.io` | DNS only until HTTPS works |
+| `A` | `@` | `185.199.108.153` (and `.109`, `.110`, `.111`) | DNS only until HTTPS works |
+
+Or apex `CNAME` flattening to `timelapsetech.github.io` if your DNS supports it.
+
+After DNS propagates, enable **Enforce HTTPS** in Pages settings.
 
 ## Structure
 

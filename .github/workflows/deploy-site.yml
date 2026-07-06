@@ -17,13 +17,15 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/configure-pages@v5
 
       - uses: actions/setup-node@v4
         with:
@@ -48,5 +50,18 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - id: deployment
+      - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
+        continue-on-error: true
+
+      - name: Retry deploy (transient Pages failures)
+        if: steps.deployment.outcome == 'failure'
+        id: deployment_retry
+        uses: actions/deploy-pages@v4
+
+      - name: Fail if deploy did not succeed
+        if: steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome == 'failure'
+        run: |
+          echo "::error::GitHub Pages deploy failed. If mediaskills.ai DNS is not pointed at GitHub yet, remove the custom domain under Settings → Pages, re-run this workflow, then re-add the domain after DNS is correct."
+          exit 1
