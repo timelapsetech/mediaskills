@@ -15,8 +15,8 @@ Open-source [Agent Skills](https://agentskills.io) for media processing — port
 Read [AGENTS.md](AGENTS.md) for skill routing. Machine-readable catalog: [skills/index.json](skills/index.json).
 
 ```bash
-npx skills add timelapsetech/mediaskills@v0.1.0 --skill install-media-tools
-npx skills add timelapsetech/mediaskills@v0.1.0 --skill inspect
+npx skills add timelapsetech/mediaskills@v0.1.1 --skill install-media-tools
+npx skills add timelapsetech/mediaskills@v0.1.1 --skill inspect
 bash skills/install-media-tools/scripts/doctor.sh
 ```
 
@@ -24,16 +24,16 @@ bash skills/install-media-tools/scripts/doctor.sh
 
 ```bash
 # List available skills
-npx skills add timelapsetech/mediaskills@v0.1.0 --list
+npx skills add timelapsetech/mediaskills@v0.1.1 --list
 
-# Install all skills (pin @v0.1.0 for reproducibility)
-npx skills add timelapsetech/mediaskills@v0.1.0 --all
+# Install all skills (pin @v0.1.1 for reproducibility)
+npx skills add timelapsetech/mediaskills@v0.1.1 --all
 
 # Install one skill
-npx skills add timelapsetech/mediaskills@v0.1.0 --skill inspect
+npx skills add timelapsetech/mediaskills@v0.1.1 --skill inspect
 
 # Install globally
-npx skills add timelapsetech/mediaskills@v0.1.0 -g --skill audio
+npx skills add timelapsetech/mediaskills@v0.1.1 -g --skill audio
 ```
 
 ## System dependencies

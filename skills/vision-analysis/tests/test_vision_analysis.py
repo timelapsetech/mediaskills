@@ -17,6 +17,7 @@ SKILL_DIR = Path(__file__).resolve().parents[1]
 SCRIPTS = SKILL_DIR / "scripts"
 
 sys.path.insert(0, str(SCRIPTS))
+from _forced_narrative_lib import build_dialogue_rows_from_analysis  # noqa: E402
 from _report_lib import (  # noqa: E402
     build_condensed_rows,
     condense_text_rows,
@@ -121,7 +122,7 @@ def sample_analysis(sample_manifest: Path, sample_video: Path) -> Path:
                 "keywords": ["interview"],
                 "on_screen_text": [
                     {
-                        "text": "We need to leave now.",
+                        "text": "OFFICER: We need to leave the property now.",
                         "text_type": "subtitle",
                         "location": "bottom",
                         "confidence": 0.95,
@@ -249,8 +250,10 @@ def test_forced_narrative_report(sample_analysis: Path, tmp_path: Path, monkeypa
     assert result.returncode == 0, result.stderr
     data = parse_json_stdout(result)
     assert data["ok"] is True
-    rows = build_condensed_rows(json.loads(sample_analysis.read_text()), include_types={"subtitle"})
+    analysis = json.loads(sample_analysis.read_text())
+    rows = build_dialogue_rows_from_analysis(analysis)
     assert data["data"]["row_count"] == len(rows)
+    assert data["data"]["row_count"] >= 1
 
 
 def test_graphics_on_screen_report(sample_analysis: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch):

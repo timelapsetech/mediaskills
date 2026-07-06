@@ -37,4 +37,4 @@ body:
     id: version
     attributes:
       label: mediaskills version or git tag
-      placeholder: v0.1.0
+      placeholder: v0.1.1

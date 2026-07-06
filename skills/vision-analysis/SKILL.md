@@ -19,6 +19,10 @@ Interval-based and shot-level visual analysis: frame extraction, **agent-driven*
 - **`image`** — `image.ocr` for a single still without a sequence pipeline.
 - **`captions-compliance`** — validate separate caption sidecar files (SRT/VTT), not burned-in text.
 
+## Output paths
+
+All script outputs write to the **workspace root** `.mediaskills/generated/` (not inside this skill folder). Frame JPGs, manifests, and reports share that directory across skills. Override with `$MEDIASKILLS_DATA_DIR/generated/` when set.
+
 ## Agent vs scripts
 
 | Step | Who | Tool |
@@ -73,6 +77,24 @@ uv run scripts/forced_narrative_report.py --analysis-path .mediaskills/generated
 
 Read [references/AGENT_FRAME_ANALYSIS.md](references/AGENT_FRAME_ANALYSIS.md) for the exact per-frame JSON schema and classification rules.
 
+## Forced narrative deliverable format
+
+After `forced_narrative_report.py` (agent vision path) or `compile_forced_narrative_report.py` (OCR path), present burned-in dialogue in this table — **not** the raw on-screen text dump:
+
+| Embedded TC | Speaker / context | Text (OCR) |
+| --- | --- | --- |
+| 01:01:27:00 | Squatter | I want you to go before the throne of God! |
+| 01:02:00:00 | Squatter | Can you get off the property? You're here illegally. |
+| 01:02:30:00 | Squatter (phone) | Dispatch, they're trying to break into my bathroom. |
+
+Rules for the agent:
+
+1. **Embedded TC** — use `embedded_tc` from the report JSON when the source has a tmcd track; otherwise use file-relative `start_timecode`.
+2. **Speaker** — parse from burned-in caption labels (`SQUATTER:`, `OFFICER:`, etc.); use `—` when no label is visible.
+3. **Text** — literal burned-in dialogue only; exclude slates, legal cards, credits, show logos, and OCR garbage.
+4. **Full coverage** — include every dialogue line in the report; do not sample or truncate.
+5. **JSON** — cite the paired `*_forced_narrative_*.json` for programmatic use; CSV has the same columns.
+
 ## Recipe: shot-based analysis (graphics, title cards)
 
 ```bash
@@ -95,7 +117,12 @@ uv run scripts/extract_title_text.py --analysis-path .mediaskills/generated/prog
 
 ```bash
 uv run scripts/compile_report.py --input program.mp4
+uv run scripts/compile_forced_narrative_report.py \
+  --onscreen-json .mediaskills/generated/program_onscreen_text_....json \
+  --input program.mp4
 ```
+
+The second step filters OCR rows to burned-in dialogue and writes the forced-narrative table format above.
 
 ## Gotchas
 
@@ -114,7 +141,8 @@ uv run scripts/compile_report.py --input program.mp4
 | `validate_analysis.py` | Check analysis JSON before reports |
 | `analysis_schema.py` | JSON schema for analysis documents |
 | `text_on_screen_report.py` | All text types, timecoded |
-| `forced_narrative_report.py` | Burned-in subtitles only |
+| `forced_narrative_report.py` | Burned-in subtitles — dialogue table (agent analysis) |
+| `compile_forced_narrative_report.py` | Burned-in subtitles — dialogue table (from OCR JSON) |
 | `graphics_on_screen_report.py` | Graphics/titles (excludes subtitles) |
 | `extract_title_text.py` | Title cards and graphics text |
 | `compile_report.py` | Legacy tesseract OCR |

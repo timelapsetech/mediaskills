@@ -107,4 +107,6 @@ def test_compile(sample_video: Path, tmp_path: Path, monkeypatch: pytest.MonkeyP
     assert md.is_file()
     assert json_path.is_file()
     assert "# Program master:" in md.read_text(encoding="utf-8")
-    assert json.loads(json_path.read_text(encoding="utf-8"))["segments"]
+    report = json.loads(json_path.read_text(encoding="utf-8"))
+    assert report["rows"]
+    assert data["data"]["segment_count"] == len(report["rows"])

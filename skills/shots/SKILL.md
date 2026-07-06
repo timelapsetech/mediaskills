@@ -31,6 +31,10 @@ Use **shots** when you need every edit point or shot-level stills for vision ana
 
 Prefer shot detection over fixed-interval frame sampling when the unit of analysis is a **shot**, not a time grid. For uniform time sampling (e.g. every 1s for forced-narrative sweeps), extract frames at fixed intervals instead.
 
+## Output paths
+
+Shot manifests and extracted stills write to the **workspace root** `.mediaskills/generated/` (not inside this skill folder). Override with `$MEDIASKILLS_DATA_DIR/generated/` when set.
+
 ## Scripts
 
 | Script | Purpose |

@@ -37,6 +37,17 @@ uv run scripts/convert_df.py \
   --to non-drop-frame
 ```
 
+## Embedded SMPTE on broadcast masters
+
+Many `.mov` masters start at e.g. `00:58:40;00` with episode at `01:00:00;00`:
+
+```bash
+uv run scripts/extract.py --input master.mov
+uv run scripts/calculate.py --timecode 00:58:40;00 --op add --offset-seconds 80.013 --fps 30000/1001
+```
+
+For labeled segment tables with embedded TC, use **program-master** `label_segments.py` + `compile.py`.
+
 ## Agent notes
 
 - Semicolon (`;`) in frame field = drop-frame display.

@@ -8,7 +8,6 @@
 from __future__ import annotations
 
 import argparse
-import os
 import subprocess
 import tempfile
 from pathlib import Path
@@ -19,16 +18,13 @@ from _mediaskills_common import (
     emit_progress,
     emit_success,
     main_wrapper,
+    mediaskills_dir,
     require_cmd,
 )
 
 
 def downloads_dir() -> Path:
-    data_dir = os.environ.get("MEDIASKILLS_DATA_DIR")
-    if data_dir and data_dir.startswith("/"):
-        out = Path(data_dir) / "downloads"
-    else:
-        out = Path.cwd() / ".mediaskills" / "downloads"
+    out = mediaskills_dir() / "downloads"
     out.mkdir(parents=True, exist_ok=True)
     return out
 

@@ -3,7 +3,7 @@
 Start here when choosing a mediaskills skill. Install with:
 
 ```bash
-npx skills add timelapsetech/mediaskills@v0.1.0 --skill <name>
+npx skills add timelapsetech/mediaskills@v0.1.1 --skill <name>
 ```
 
 Machine-readable catalog: [`skills/index.json`](skills/index.json). Regenerate with `python scripts/list_ops.py --write`.

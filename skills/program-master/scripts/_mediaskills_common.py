@@ -59,12 +59,24 @@ def run_bytes(cmd: list[str], op: str) -> subprocess.CompletedProcess[bytes]:
         emit_error(op, f"Command failed: {err}", code=EXIT_PROCESSING)
 
 
-def generated_dir() -> Path:
+def workspace_root() -> Path:
+    """Directory containing `.agents/skills` (repo / workspace root)."""
+    here = Path(__file__).resolve().parent
+    for parent in (here, *here.parents):
+        if (parent / ".agents" / "skills").is_dir():
+            return parent
+    return Path.cwd()
+
+
+def mediaskills_dir() -> Path:
     data_dir = os.environ.get("MEDIASKILLS_DATA_DIR")
     if data_dir and data_dir.startswith("/"):
-        out = Path(data_dir) / "generated"
-    else:
-        out = Path.cwd() / ".mediaskills" / "generated"
+        return Path(data_dir)
+    return workspace_root() / ".mediaskills"
+
+
+def generated_dir() -> Path:
+    out = mediaskills_dir() / "generated"
     out.mkdir(parents=True, exist_ok=True)
     return out
 
@@ -301,7 +313,7 @@ def add_output_arg(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--output",
         "-o",
-        help="Output path (default: auto-generated under .mediaskills/generated/)",
+        help="Output path (default: workspace .mediaskills/generated/)",
     )
 
 

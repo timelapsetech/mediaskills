@@ -3,7 +3,7 @@
 # dependencies = []
 # ///
 
-"""Compile a labeled segment manifest into Markdown and JSON reports."""
+"""Compile a labeled segment manifest into agent-ready Markdown and JSON reports."""
 
 from __future__ import annotations
 
@@ -18,6 +18,7 @@ from _mediaskills_common import (
     main_wrapper,
     resolve_output,
 )
+from _report_lib import build_report, render_markdown_report
 
 OP = "program_master.compile"
 
@@ -37,7 +38,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--json-output",
-        help="Optional path for compiled JSON copy (default: auto-generated)",
+        help="Optional path for compiled report JSON (default: auto-generated)",
     )
     return parser
 
@@ -48,47 +49,24 @@ def main() -> None:
     if not structure_path or not Path(structure_path).is_file():
         emit_error(OP, "Provide --structure-path from label_segments.py or analyze_structure.py", code=1)
 
-    data = json.loads(Path(structure_path).read_text(encoding="utf-8"))
-    source = data.get("input_path") or "program"
+    manifest = json.loads(Path(structure_path).read_text(encoding="utf-8"))
+    source = manifest.get("input_path") or "program"
+    report = build_report(manifest)
+
     md = resolve_output(source, "_program_master.md", args.output)
-    segments = data.get("segments") or []
-    content_segments = [s for s in segments if s.get("segment_type") != "gap"]
-    labeled = [
-        s
-        for s in content_segments
-        if s.get("label") and s.get("label") not in ("unlabeled",)
-    ]
-    lines = [
-        f"# Program master: {Path(source).name}",
-        "",
-        f"- Duration: {data.get('duration')}s",
-        f"- Segments: {len(segments)}",
-        f"- Content segments: {len(content_segments)}",
-        f"- Labeled content segments: {len(labeled)}",
-        f"- Black+silent gaps: {len(data.get('black_silence_gaps') or data.get('gaps') or [])}",
-        f"- Silences: {len(data.get('silences') or [])}",
-        f"- Blacks: {len(data.get('blacks') or [])}",
-        "",
-        "| # | Type | Start | End | Duration | Label | Source |",
-        "| --- | --- | --- | --- | --- | --- | --- |",
-    ]
-    for seg in segments:
-        seg_type = seg.get("segment_type") or "content"
-        lines.append(
-            f"| {seg.get('index')} | {seg_type} | {seg.get('start_timecode', seg.get('start'))} | "
-            f"{seg.get('end_timecode', seg.get('end'))} | {round(float(seg.get('duration') or 0), 3)}s | "
-            f"{seg.get('label', '')} | {seg.get('label_source', '')} |"
-        )
-    md.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    out_json = resolve_output(source, "_program_master.json", args.json_output)
-    out_json.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    md.write_text(render_markdown_report(report), encoding="utf-8")
+
+    out_json = resolve_output(source, "_program_master_report.json", args.json_output)
+    out_json.write_text(json.dumps(report, indent=2), encoding="utf-8")
+
     emit_success(
         OP,
         {
             "output_path": str(md),
             "json_path": str(out_json),
-            "segment_count": len(data.get("segments") or []),
-            "rows": data.get("segments") or [],
+            "segment_count": report.get("segment_count"),
+            "rows": report.get("rows"),
+            "episode": report.get("episode"),
         },
         [str(md), str(out_json)],
     )

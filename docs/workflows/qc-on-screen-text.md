@@ -19,12 +19,16 @@ uv run scripts/merge_analysis.py \
 # 3. Validate and report
 uv run scripts/validate_analysis.py --analysis-path analysis.json
 uv run scripts/text_on_screen_report.py --analysis-path analysis.json --force
+uv run scripts/forced_narrative_report.py --analysis-path analysis.json --force
 ```
 
 ## OCR-only shortcut (no agent)
 
 ```bash
 uv run scripts/compile_report.py --input clip.mp4 --interval 2
+uv run scripts/compile_forced_narrative_report.py \
+  --onscreen-json .mediaskills/generated/clip_onscreen_text_*.json \
+  --input clip.mp4
 ```
 
 Requires `tesseract` on PATH.

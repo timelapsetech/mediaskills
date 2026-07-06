@@ -98,7 +98,7 @@ Read `data.silence_starts` / `data.silence_ends` (seconds) to split on pauses or
 | `scripts/resample.py` | Change sample rate | `--input`, `--sample-rate`, `--output` |
 | `scripts/silence_detect.py` | List silence regions | `--input` |
 
-Outputs default to `.mediaskills/generated/` unless `--output` is set.
+Outputs default to the **workspace root** `.mediaskills/generated/` unless `--output` is set. Override with `$MEDIASKILLS_DATA_DIR/generated/` when set.
 
 ## Do not use for
 

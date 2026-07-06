@@ -10,7 +10,7 @@ metadata:
 
 # Video Transformation
 
-ffmpeg-based video operations: editorial cuts, transcoding, scaling, muxing, and derivative exports. Outputs land in `.mediaskills/generated/` unless you pass `--output`.
+ffmpeg-based video operations: editorial cuts, transcoding, scaling, muxing, and derivative exports. Outputs land in the **workspace root** `.mediaskills/generated/` unless you pass `--output`. Override base path with `$MEDIASKILLS_DATA_DIR`.
 
 ## When to use
 

@@ -15,6 +15,14 @@ TIMECODE_RE = re.compile(
 )
 
 
+def fps_as_float(fps: float | str) -> float:
+    """Return exact fps as float (handles ``30000/1001`` rationals from ffprobe)."""
+    if isinstance(fps, str) and "/" in fps:
+        num, den = fps.split("/", 1)
+        return float(num) / float(den)
+    return float(fps)
+
+
 def normalize_fps(fps: float | str) -> str:
     """Map common fps inputs to strings the timecode library accepts."""
     if isinstance(fps, str):

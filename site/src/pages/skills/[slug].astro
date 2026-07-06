@@ -18,6 +18,8 @@ if (!skill) {
 }
 
 const cookbooks = getRelatedCookbooks(skill.name);
+const catalog = getCatalog();
+const { install } = catalog;
 const description = skill.description;
 
 const skillJsonLd = {
@@ -70,7 +72,7 @@ const skillJsonLd = {
 
         <div class="install-box">
           <h4>Install</h4>
-          <pre class="code-block"><code>npx skills add timelapsetech/mediaskills@v0.1.0 --skill {skill.name}</code></pre>
+          <pre class="code-block"><code>npx skills add {install.repo}{install.pin} --skill {skill.name}</code></pre>
         </div>
       </aside>
 

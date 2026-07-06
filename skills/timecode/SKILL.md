@@ -33,7 +33,8 @@ Drop-frame timecode skips frame numbers 00 and 01 at the start of each minute **
 
 - **Semicolon matters** — do not normalize `;` to `:` before parsing; it changes DF vs NDF meaning.
 - **Two “seconds” values** — scripts return `seconds` (linear from frame index), `seconds_system` (video system grid), and `seconds_realtime` (wall clock). For ffmpeg `-ss` on NTSC DF material, prefer `seconds_realtime`.
-- **29.97 is not 30** — use `29.97` or `30000/1001`, not rounded `30`, when DF is intended.
+- **29.97 is not 30** — use `29.97` or `30000/1001`, not rounded `30`, when DF is intended. When mapping **file seconds → embedded TC**, multiply by the exact rational fps from ffprobe (`30000/1001`), not the library's integer `_int_framerate` (30).
+- **Embedded start TC** — masters often start at embedded timecodes e.g. `00:58:40;00` with episode at `01:00:00;00`. Run `extract.py` to read the tmcd start; use `calculate.py` or `program-master` to offset segment boundaries.
 - **Missing file timecode** — many MP4/H.264 files have no timecode tag; `extract.py` returns `timecode: null` — derive from fps + duration instead.
 - **Cross-fps retiming** — default `convert.py` preserves **wall-clock** duration (`--preserve realtime`). Use `--preserve frames` only when you need the same frame index at a new rate.
 
@@ -86,6 +87,16 @@ uv run scripts/analyze_metadata.py --input /path/to/ffprobe.json
 ```bash
 uv run scripts/extract.py --input /path/to/clip.mov
 ```
+
+### Map file seconds to embedded SMPTE (broadcast master)
+
+After `extract.py` reports e.g. start `00:58:40;00` at `30000/1001`:
+
+```bash
+uv run scripts/calculate.py --timecode 00:58:40;00 --op add --offset-seconds 80.013 --fps 30000/1001
+```
+
+For full segment manifests with labels, prefer **`program-master`** `label_segments.py` (auto-detects tmcd).
 
 ## Troubleshooting
 

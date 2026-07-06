@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1",
   "repository": "https://github.com/timelapsetech/mediaskills",
   "spec": "https://agentskills.io/specification",
   "skill_count": 13,
@@ -401,7 +401,7 @@
       "name": "program-master",
       "description": "TV program segmentation \u2014 detect black+silent break separators, probe boundary frames, and label content segments (including slate-driven labels). Use when finding commercial breaks, naming episodes/parts, or mapping broadcast master structure \u2014 not hard cuts inside content.",
       "license": "MIT",
-      "compatibility": "Requires ffmpeg and ffprobe on PATH. Optional tesseract for OCR slate text. Scripts are Python 3.11+, run via `uv run`.",
+      "compatibility": "Requires ffmpeg and ffprobe on PATH. Optional tesseract for OCR slate text. Scripts are Python 3.11+, run via `uv run` (`timecode` PyPI package for embedded SMPTE mapping).",
       "metadata": {
         "mediaskills-category": "video"
       },
@@ -454,9 +454,12 @@
           "script": "label_segments.py",
           "language": "python",
           "op": "program_master.label_segments",
-          "pep723_dependencies": [],
+          "pep723_dependencies": [
+            "timecode>=1.5.1"
+          ],
           "common_flags": [
             "--input",
+            "--timecode",
             "--fps"
           ]
         },
@@ -844,6 +847,17 @@
           "common_flags": []
         },
         {
+          "script": "compile_forced_narrative_report.py",
+          "language": "python",
+          "op": "vision.compile_forced_narrative_report",
+          "pep723_dependencies": [
+            "timecode>=1.5.1"
+          ],
+          "common_flags": [
+            "--input"
+          ]
+        },
+        {
           "script": "compile_report.py",
           "language": "python",
           "op": "vision.compile_report",
@@ -872,7 +886,9 @@
           "script": "forced_narrative_report.py",
           "language": "python",
           "op": "vision.forced_narrative_report",
-          "pep723_dependencies": [],
+          "pep723_dependencies": [
+            "timecode>=1.5.1"
+          ],
           "common_flags": []
         },
         {

@@ -10,7 +10,7 @@ from __future__ import annotations
 import argparse
 
 from _mediaskills_common import EXIT_BAD_ARGS, emit_error, emit_success, main_wrapper
-from _timecode_lib import build_timecode, timecode_payload
+from _timecode_lib import build_timecode, fps_as_float, timecode_payload
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -48,7 +48,7 @@ def main() -> None:
         )
         delta_frames = offset_tc.frame_number
     elif args.offset_seconds is not None:
-        delta_frames = int(round(args.offset_seconds * base._int_framerate))
+        delta_frames = int(round(args.offset_seconds * fps_as_float(base.framerate)))
     else:
         emit_error(op, "Provide --offset-seconds or --offset-timecode", code=EXIT_BAD_ARGS)
 

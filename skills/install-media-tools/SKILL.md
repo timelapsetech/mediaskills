@@ -19,6 +19,17 @@ Bootstrap the **system binaries** other mediaskills depend on. These scripts run
 - **Path debugging** — use `which.sh` to confirm which binary the agent shell resolves.
 - **Not for Python deps** — other skills use `uv run` with PEP 723 inline deps; this skill only installs OS-level tools.
 
+## Output paths (all skills)
+
+Script outputs always land under the **workspace root** `.mediaskills/` — never inside `.agents/skills/<skill>/`:
+
+| Subfolder | Used by |
+| --- | --- |
+| `generated/` | Most skills — manifests, reports, frames, transcodes, captions, etc. |
+| `downloads/` | `download` skill — fetched media |
+
+Paths resolve from the repo root even when you `cd` into a skill folder. Override with `$MEDIASKILLS_DATA_DIR` for a custom base directory.
+
 ## Toolchain overview
 
 | Tool | Provided by | Used by |

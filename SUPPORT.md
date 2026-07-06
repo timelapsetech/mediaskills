@@ -27,7 +27,7 @@
 ## Version pinning
 
 ```bash
-npx skills add timelapsetech/mediaskills@v0.1.0 --skill inspect
+npx skills add timelapsetech/mediaskills@v0.1.1 --skill inspect
 ```
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes.

@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.11"
-# dependencies = []
+# dependencies = ["timecode>=1.5.1"]
 # ///
 
 """
@@ -16,11 +16,17 @@ import argparse
 import json
 from pathlib import Path
 
+from _embedded_timecode import (
+    _fps_as_float,
+    apply_embedded_timecodes,
+    extract_embedded_timecode,
+)
 from _mediaskills_common import (
     add_input_arg,
     add_output_arg,
     emit_progress,
     emit_success,
+    ffprobe_json,
     generated_dir,
     main_wrapper,
     probe_duration,
@@ -79,7 +85,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--fps",
         type=float,
         default=29.97,
-        help="Timecode display fps (default 29.97)",
+        help="Timecode display fps for file-relative TC (default 29.97)",
+    )
+    parser.add_argument(
+        "--timecode-mode",
+        choices=["embedded", "file"],
+        default="embedded",
+        help="Use embedded SMPTE tmcd track when present (default embedded)",
     )
     return parser
 
@@ -136,18 +148,32 @@ def main() -> None:
     segments = build_content_segments(gaps, duration)
     apply_probe_labels(segments, probes)
 
+    probe_meta = ffprobe_json(str(path), OP)
+    embedded_tc = (
+        extract_embedded_timecode(probe_meta)
+        if args.timecode_mode == "embedded"
+        else None
+    )
+    tc_fps = embedded_tc["fps"] if embedded_tc else str(fps)
+    tc_fps_float = _fps_as_float(tc_fps)
+
     for seg in segments:
-        seg["start_timecode"] = seconds_to_tc(seg["start"], fps)
-        seg["end_timecode"] = seconds_to_tc(seg["end"], fps)
+        seg["start_timecode"] = seconds_to_tc(seg["start"], tc_fps_float)
+        seg["end_timecode"] = seconds_to_tc(seg["end"], tc_fps_float)
         if seg.get("segment_type") == "content" and not seg.get("label"):
             seg["label"] = "unlabeled"
             seg["label_source"] = "none"
+
+    if embedded_tc:
+        apply_embedded_timecodes(segments, embedded_tc)
 
     manifest_path = resolve_output(str(path), "_labeled_segments.json", args.output)
     manifest = {
         "input_path": str(path),
         "duration": duration,
-        "fps": fps,
+        "fps": tc_fps if embedded_tc else fps,
+        "timecode_mode": "embedded" if embedded_tc else "file",
+        "embedded_timecode": embedded_tc,
         "probe_offset_seconds": probe_offset,
         "black_silence_gaps": gaps,
         "silences": silences,

@@ -22,7 +22,7 @@ Fetch remote media with yt-dlp. Use this skill when you have a **URL** and need 
 
 - **Network required** — downloads fail offline or behind restrictive firewalls. Corporate proxies may need `HTTP_PROXY` / `HTTPS_PROXY` env vars.
 - **Rate limits and bot checks** — some sites block datacenter IPs or require cookies. Pass cookies via yt-dlp config (`~/.config/yt-dlp/config`) if downloads fail with 403/429.
-- **Output location** — files land in `.mediaskills/downloads/` (cwd) or `$MEDIASKILLS_DATA_DIR/downloads/` when set. Filename pattern: `Title [video_id].ext`.
+- **Output location** — files land in the **workspace root** `.mediaskills/downloads/` (not inside this skill folder), or `$MEDIASKILLS_DATA_DIR/downloads/` when set. Filename pattern: `Title [video_id].ext`.
 - **Playlists** — this script downloads the URL as given; playlist URLs may fetch multiple files. Prefer single-video URLs for predictable output.
 - **Live streams** — live content may produce partial files if recording is interrupted.
 - **Legal / ToS** — only download content you have rights to access. Respect platform terms and copyright.

@@ -30,7 +30,18 @@ def main() -> None:
             "properties": {
                 "input_path": {"type": "string"},
                 "duration": {"type": "number"},
-                "fps": {"type": "number"},
+                "fps": {"oneOf": [{"type": "number"}, {"type": "string"}]},
+                "timecode_mode": {"type": "string", "enum": ["embedded", "file"]},
+                "embedded_timecode": {
+                    "type": "object",
+                    "properties": {
+                        "timecode": {"type": "string"},
+                        "fps": {"oneOf": [{"type": "number"}, {"type": "string"}]},
+                        "drop_frame": {"type": "boolean"},
+                        "source": {"type": "string", "enum": ["tmcd", "container"]},
+                        "stream_index": {"type": ["integer", "null"]},
+                    },
+                },
                 "probe_offset_seconds": {"type": "number"},
                 "black_silence_gaps": {"type": "array"},
                 "probes": {
@@ -56,6 +67,8 @@ def main() -> None:
                             "duration": {"type": "number"},
                             "start_timecode": {"type": "string"},
                             "end_timecode": {"type": "string"},
+                            "start_timecode_file": {"type": "string"},
+                            "end_timecode_file": {"type": "string"},
                             "segment_type": {"type": "string", "enum": ["content", "gap"]},
                             "label": {"type": "string"},
                             "label_source": {"type": "string"},

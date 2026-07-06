@@ -15,6 +15,20 @@ If the agent cannot view images, use the **legacy OCR path** (`compile_report.py
 
 Repeat steps 2–4 until `analyzed_count` equals `frame_count`.
 
+## Forced narrative report format
+
+When the user asks for burned-in subtitles, forced narrative, or dialogue on screen, run `forced_narrative_report.py` and present **every dialogue line** in this table:
+
+| Embedded TC | Speaker / context | Text (OCR) |
+| --- | --- | --- |
+| 01:01:27:00 | Squatter | I want you to go before the throne of God! |
+| 01:03:24:00 | Officer | Yeah, obviously we're here to make sure that there's no sort of disturbance... |
+
+- Classify spoken dialogue burned into the picture as `text_type: subtitle`.
+- Put speaker names from caption labels in the `text` field as `SPEAKER: dialogue` when visible (e.g. `"text": "SQUATTER: Can you get off the property?"`).
+- The report script parses speaker labels and maps file seconds to embedded SMPTE when tmcd is present.
+- Do **not** include title cards, slates, credits, legal disclaimers, or lower-third show logos in subtitle entries.
+
 ## Per-frame JSON (agent output)
 
 Each analyzed frame should include timing fields copied from the manifest plus vision fields:

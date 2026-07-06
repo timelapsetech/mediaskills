@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.11"
-# dependencies = []
+# dependencies = ["timecode>=1.5.1"]
 # ///
 
 """Forced narrative report: burned-in subtitles only (text_type=subtitle)."""
@@ -8,14 +8,18 @@
 from __future__ import annotations
 
 import argparse
+from pathlib import Path
 
+from _forced_narrative_lib import (
+    _embedded_tc_from_probe,
+    build_dialogue_rows_from_analysis,
+    write_forced_narrative_report_files,
+)
 from _mediaskills_common import emit_error, emit_success, main_wrapper
 from _report_lib import (
     analysis_stem,
-    build_condensed_rows,
     load_analysis_resolved,
     maybe_emit_reused_report,
-    write_report_files,
 )
 
 OP = "vision.forced_narrative_report"
@@ -44,29 +48,25 @@ def main() -> None:
     ):
         return
 
-    rows = build_condensed_rows(analysis, include_types={"subtitle"})
-    columns = [
-        "start_timecode",
-        "end_timecode",
-        "text",
-        "shot_index",
-        "start_seconds",
-        "end_seconds",
-        "confidence",
-    ]
+    input_path = analysis.get("input_path")
+    embedded_fn = None
+    embedded_meta = None
+    if input_path:
+        embedded_fn, embedded_meta = _embedded_tc_from_probe(str(input_path))
+
+    rows = build_dialogue_rows_from_analysis(analysis, embedded_tc_fn=embedded_fn)
     meta = {
         "report_type": "forced_narrative",
         "analysis_path": str(resolved),
-        "input_path": analysis.get("input_path"),
+        "input_path": input_path,
+        "input_name": analysis.get("input_name") or (Path(input_path).name if input_path else None),
+        "embedded_timecode": embedded_meta,
         "include_types": ["subtitle"],
     }
-    outputs = write_report_files(
+    outputs = write_forced_narrative_report_files(
         analysis_stem(str(resolved)),
-        "forced_narrative",
         rows,
         meta,
-        columns,
-        "Forced narrative (burned-in subtitles) report",
     )
     emit_success(
         OP,

@@ -29,8 +29,16 @@ Run `bash skills/install-media-tools/scripts/doctor.sh` for a full report.
 | Symptom | Cause | Fix |
 | --- | --- | --- |
 | Off by ~3.6 s/hour | Drop-frame vs non-drop-frame | `timecode/detect_format.py`; check `;` vs `:` |
+| Segment TC drifts on broadcast master | Rounded 30 fps instead of `30000/1001` | Use exact rational from ffprobe; `program-master --timecode-mode embedded` |
 | Wrong cross-fps result | Used frame index vs wall-clock | `convert.py` defaults to `--preserve realtime` |
-| `timecode: null` in extract | No tag in container | Derive from fps + duration |
+| `timecode: null` in extract | No tag in container | Derive from fps + duration; proxies lack tmcd — use source master |
+
+## Output paths
+
+| Symptom | Cause | Fix |
+| --- | --- | --- |
+| Files under `.agents/skills/...` | Pre-0.1.1 cwd-relative paths | Upgrade to 0.1.1+; outputs belong at workspace `.mediaskills/` |
+| Cannot find generated manifest | Looking in skill folder | Check `<workspace>/.mediaskills/generated/` or set `MEDIASKILLS_DATA_DIR` |
 
 ## Video transformation
 

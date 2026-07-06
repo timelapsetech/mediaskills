@@ -57,9 +57,9 @@ Agents should parse **stdout** for the final result; treat stderr as logs unless
 
 | Variable | Purpose |
 | --- | --- |
-| `MEDIASKILLS_DATA_DIR` | Base directory for `.mediaskills/generated/` (absolute path recommended in CI) |
+| `MEDIASKILLS_DATA_DIR` | Base directory for all `.mediaskills/*` outputs (`generated/`, `downloads/`, etc.). Absolute path recommended in CI. |
 
-Default output: `./.mediaskills/generated/` relative to cwd.
+Default output: `<workspace>/.mediaskills/generated/` at the repo root — the directory that contains `.agents/skills`. Scripts walk up from the skill script path to find it; if not found, they fall back to `cwd`. Outputs never land inside `.agents/skills/<skill>/`.
 
 ## Invocation
 
