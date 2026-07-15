@@ -14,7 +14,8 @@ Interval-based and shot-level visual analysis: frame extraction, **agent-driven*
 
 ## When to use
 
-- **This skill** — extract frame sequences, inventory on-screen text with timecodes, forced-narrative QC.
+- **This skill** — extract frame sequences, inventory on-screen text/graphics with timecodes, agent-guided visual QC.
+- **`forced-narrative-exact`** — exhaustive, frame-accurate burned-in dialogue inventory with exclusive-end SMPTE boundaries and completeness audit.
 - **`shots`** — cut detection and midpoint stills when the unit of analysis is a **shot**.
 - **`image`** — `image.ocr` for a single still without a sequence pipeline.
 - **`captions-compliance`** — validate separate caption sidecar files (SRT/VTT), not burned-in text.

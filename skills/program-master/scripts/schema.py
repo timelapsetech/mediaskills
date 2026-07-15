@@ -27,13 +27,28 @@ def main() -> None:
         OP,
         {
             "type": "object",
+            "required": [
+                "schema_version",
+                "algorithm_version",
+                "input_path",
+                "duration",
+                "fps",
+                "timecode_mode",
+                "segments",
+                "effective_config",
+                "selected_streams",
+                "provenance",
+                "validation",
+            ],
             "properties": {
+                "schema_version": {"type": "string", "const": "2.0"},
+                "algorithm_version": {"type": "string"},
                 "input_path": {"type": "string"},
                 "duration": {"type": "number"},
                 "fps": {"oneOf": [{"type": "number"}, {"type": "string"}]},
                 "timecode_mode": {"type": "string", "enum": ["embedded", "file"]},
                 "embedded_timecode": {
-                    "type": "object",
+                    "type": ["object", "null"],
                     "properties": {
                         "timecode": {"type": "string"},
                         "fps": {"oneOf": [{"type": "number"}, {"type": "string"}]},
@@ -43,6 +58,16 @@ def main() -> None:
                     },
                 },
                 "probe_offset_seconds": {"type": "number"},
+                "black_detection": {
+                    "type": "object",
+                    "properties": {
+                        "pixel_threshold": {"type": "number"},
+                        "picture_threshold": {"type": "number"},
+                        "fade_refine": {"type": "boolean"},
+                        "fade_handle_frames": {"type": "integer"},
+                        "boundary_policy": {"type": "string"},
+                    },
+                },
                 "black_silence_gaps": {"type": "array"},
                 "probes": {
                     "type": "array",
@@ -58,8 +83,18 @@ def main() -> None:
                 },
                 "segments": {
                     "type": "array",
+                    "minItems": 1,
                     "items": {
                         "type": "object",
+                        "required": [
+                            "index",
+                            "start",
+                            "end",
+                            "duration",
+                            "start_timecode",
+                            "end_timecode",
+                            "segment_type",
+                        ],
                         "properties": {
                             "index": {"type": "integer"},
                             "start": {"type": "number"},
@@ -74,11 +109,22 @@ def main() -> None:
                             "label_source": {"type": "string"},
                             "slate_text": {"type": "string"},
                             "probe_frame_path": {"type": "string"},
+                            "boundary_evidence": {"type": "object"},
                         },
                     },
                 },
                 "silences": {"type": "array"},
                 "blacks": {"type": "array"},
+                "effective_config": {"type": "object"},
+                "selected_streams": {"type": "object"},
+                "provenance": {
+                    "type": "object",
+                    "required": ["skill", "source", "profile", "toolchain", "command"],
+                },
+                "validation": {
+                    "type": "object",
+                    "required": ["passed", "checks", "errors", "warnings"],
+                },
             },
         },
     )

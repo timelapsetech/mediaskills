@@ -1,0 +1,46 @@
+{
+  "profile_version": "1.0",
+  "name": "broadcast-default",
+  "description": "Strict black+silence structural segmentation with fade-aware boundaries and deterministic generic labels.",
+  "streams": {
+    "video_stream": 0,
+    "audio_policy": "single",
+    "audio_stream": 0
+  },
+  "detection": {
+    "noise": "-30dB",
+    "min_duration": 0.5,
+    "pixel_threshold": 0.01,
+    "picture_threshold": 0.98,
+    "fade_refine": true,
+    "fade_handle_frames": 1,
+    "min_overlap": 0.25,
+    "probe_offset_seconds": 1.0
+  },
+  "timecode": {
+    "mode": "embedded",
+    "require_embedded": false,
+    "file_fps": 29.97
+  },
+  "ocr": {
+    "mode": "optional",
+    "language": "eng",
+    "psm": 6
+  },
+  "labels": {
+    "mode": "generic",
+    "overrides": {},
+    "require_overrides_for_content": false
+  },
+  "validation": {
+    "min_gaps": 0,
+    "require_full_coverage": true,
+    "require_contiguous_frames": true
+  },
+  "pdf": {
+    "enabled": true,
+    "fade_search_seconds": 10.0,
+    "thumbnail_width": 320,
+    "rows_per_page": 6
+  }
+}

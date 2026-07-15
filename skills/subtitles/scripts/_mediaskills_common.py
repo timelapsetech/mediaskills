@@ -331,3 +331,10 @@ def main_wrapper(main_fn: Any) -> None:
         raise
     except ValueError as e:
         emit_error("unknown", str(e), code=EXIT_BAD_ARGS)
+    except subprocess.CalledProcessError as e:
+        detail = e.stderr or e.stdout or str(e)
+        if isinstance(detail, bytes):
+            detail = detail.decode("utf-8", errors="replace")
+        emit_error("unknown", str(detail).strip()[:1200], code=EXIT_PROCESSING)
+    except RuntimeError as e:
+        emit_error("unknown", str(e), code=EXIT_PROCESSING)

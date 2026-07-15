@@ -1,8 +1,8 @@
 {
-  "version": "0.1.1",
+  "version": "0.1.2",
   "repository": "https://github.com/timelapsetech/mediaskills",
   "spec": "https://agentskills.io/specification",
-  "skill_count": 13,
+  "skill_count": 14,
   "skills": [
     {
       "name": "audio",
@@ -195,6 +195,75 @@
           "pep723_dependencies": [],
           "common_flags": [
             "--url"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "forced-narrative-exact",
+      "description": "Generate exhaustive, literal, frame-accurate forced-narrative reports from video masters containing burned-in dialogue subtitles. Use when a user requests a forced-narrative inventory, burned-in subtitle report, exact on-screen dialogue transcription, or start/end SMPTE timecodes for every subtitle, especially when embedded tmcd timecode, multiple program passes, textless duplicates, and exclusive frame boundaries must be handled consistently.",
+      "license": "MIT",
+      "compatibility": "Requires Python 3.11+, uv, ffmpeg, ffprobe, and tesseract on PATH. An image-capable agent must approve every cue; scripts only discover candidates and refine frame boundaries. Run scripts via `uv run`.",
+      "metadata": {
+        "mediaskills-category": "vision"
+      },
+      "scripts": [
+        {
+          "script": "audit_completeness.py",
+          "language": "python",
+          "op": "forced_narrative_exact.audit_completeness",
+          "pep723_dependencies": [
+            "numpy>=2",
+            "opencv-python-headless>=4.10"
+          ],
+          "common_flags": [
+            "--input",
+            "--output"
+          ]
+        },
+        {
+          "script": "build_report.py",
+          "language": "python",
+          "op": "forced_narrative_exact.build_report",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--output"
+          ]
+        },
+        {
+          "script": "refine_boundaries.py",
+          "language": "python",
+          "op": "forced_narrative_exact.refine_boundaries",
+          "pep723_dependencies": [
+            "numpy>=2",
+            "opencv-python-headless>=4.10",
+            "pytesseract>=0.3.13"
+          ],
+          "common_flags": [
+            "--input",
+            "--output"
+          ]
+        },
+        {
+          "script": "scan_caption_band.py",
+          "language": "python",
+          "op": "forced_narrative_exact.scan_caption_band",
+          "pep723_dependencies": [
+            "Pillow>=10",
+            "pytesseract>=0.3.13"
+          ],
+          "common_flags": [
+            "--input",
+            "--output"
+          ]
+        },
+        {
+          "script": "validate_report.py",
+          "language": "python",
+          "op": "forced_narrative_exact.validate_report",
+          "pep723_dependencies": [],
+          "common_flags": [
+            "--input"
           ]
         }
       ]
@@ -399,9 +468,9 @@
     },
     {
       "name": "program-master",
-      "description": "TV program segmentation \u2014 detect black+silent break separators, probe boundary frames, and label content segments (including slate-driven labels). Use when finding commercial breaks, naming episodes/parts, or mapping broadcast master structure \u2014 not hard cuts inside content.",
+      "description": "TV program segmentation \u2014 detect fade-aware black+silent break separators, preserve frame-accurate fade anchors, label content segments, and generate validated thumbnail-led broadcast segment PDF reports. Use when finding commercial breaks, naming episodes/parts, mapping broadcast master structure, or delivering a visual segment report \u2014 not hard cuts inside content.",
       "license": "MIT",
-      "compatibility": "Requires ffmpeg and ffprobe on PATH. Optional tesseract for OCR slate text. Scripts are Python 3.11+, run via `uv run` (`timecode` PyPI package for embedded SMPTE mapping).",
+      "compatibility": "Requires Python 3.11+, uv, ffmpeg, and ffprobe on PATH. Tesseract is governed by the selected OCR policy. Scripts use exact pinned PEP 723 dependencies via `uv run`.",
       "metadata": {
         "mediaskills-category": "video"
       },
@@ -422,6 +491,18 @@
           "op": "program_master.compile",
           "pep723_dependencies": [],
           "common_flags": []
+        },
+        {
+          "script": "compile_pdf.py",
+          "language": "python",
+          "op": "program_master.compile_pdf",
+          "pep723_dependencies": [
+            "reportlab==5.0.0",
+            "timecode==1.5.1"
+          ],
+          "common_flags": [
+            "--output"
+          ]
         },
         {
           "script": "detect_black_silence.py",
@@ -451,11 +532,18 @@
           ]
         },
         {
+          "script": "doctor.py",
+          "language": "python",
+          "op": "program_master.doctor",
+          "pep723_dependencies": [],
+          "common_flags": []
+        },
+        {
           "script": "label_segments.py",
           "language": "python",
           "op": "program_master.label_segments",
           "pep723_dependencies": [
-            "timecode>=1.5.1"
+            "timecode==1.5.1"
           ],
           "common_flags": [
             "--input",
@@ -464,11 +552,51 @@
           ]
         },
         {
+          "script": "run_report.py",
+          "language": "python",
+          "op": "program_master.run_report",
+          "pep723_dependencies": [
+            "pypdf==6.14.2",
+            "reportlab==5.0.0",
+            "timecode==1.5.1"
+          ],
+          "common_flags": [
+            "--input",
+            "--output",
+            "--timecode"
+          ]
+        },
+        {
           "script": "schema.py",
           "language": "python",
           "op": "program_master.schema",
           "pep723_dependencies": [],
           "common_flags": []
+        },
+        {
+          "script": "self_test.py",
+          "language": "python",
+          "op": "program_master.self_test",
+          "pep723_dependencies": [
+            "pypdf==6.14.2",
+            "reportlab==5.0.0",
+            "timecode==1.5.1"
+          ],
+          "common_flags": [
+            "--input",
+            "--output"
+          ]
+        },
+        {
+          "script": "validate_report.py",
+          "language": "python",
+          "op": "program_master.validate_report",
+          "pep723_dependencies": [
+            "pypdf==6.14.2"
+          ],
+          "common_flags": [
+            "--output"
+          ]
         }
       ]
     },

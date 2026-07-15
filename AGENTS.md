@@ -3,7 +3,7 @@
 Start here when choosing a mediaskills skill. Install with:
 
 ```bash
-npx skills add timelapsetech/mediaskills@v0.1.1 --skill <name>
+npx skills add timelapsetech/mediaskills@v0.1.2 --skill <name>
 ```
 
 Machine-readable catalog: [`skills/index.json`](skills/index.json). Regenerate with `python scripts/list_ops.py --write`.
@@ -38,6 +38,9 @@ Need shot boundaries or midpoint frames?
 Need program segmentation (blacks, silence, acts)?
   └─ program-master
 
+Need exhaustive frame-accurate burned-in dialogue / forced narrative?
+  └─ forced-narrative-exact
+
 Need on-screen text / vision analysis workflow?
   └─ vision-analysis  (agent analyzes frames; scripts merge JSON)
 
@@ -64,6 +67,8 @@ Scripts return JSON on stdout. Pass paths from `data.output_path` or `output_pat
 | timecode | `data.seconds_realtime` | `video-transformation` `--start` / `--end` |
 | speech-captions | SRT path | `captions-compliance` validate/format |
 | vision-analysis | `manifest_path` | agent frame analysis → `merge_analysis.py` |
+| program-master | labeled manifest / report bundle | `forced-narrative-exact` pass scoping |
+| forced-narrative-exact | refined JSON / report paths | validate → deliver md/json/csv/srt |
 
 ## Op ID namespaces
 
@@ -80,6 +85,7 @@ Scripts return JSON on stdout. Pass paths from `data.output_path` or `output_pat
 | `download.*` | download |
 | `shots.*` | shots |
 | `program_master.*` | program-master |
+| `forced_narrative_exact.*` | forced-narrative-exact |
 | `vision.*` | vision-analysis |
 | `install-media-tools.*` | install-media-tools (bash) |
 

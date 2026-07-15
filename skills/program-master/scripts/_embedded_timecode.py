@@ -32,14 +32,19 @@ def normalize_fps(fps: float | str) -> str:
     return str(value)
 
 
-def _video_fps(probe_meta: dict[str, Any]) -> str:
-    for stream in probe_meta.get("streams") or []:
-        if stream.get("codec_type") == "video":
-            return normalize_fps(stream.get("avg_frame_rate") or stream.get("r_frame_rate") or "29.97")
+def _video_fps(probe_meta: dict[str, Any], *, video_stream: int = 0) -> str:
+    videos = [stream for stream in probe_meta.get("streams") or [] if stream.get("codec_type") == "video"]
+    if 0 <= video_stream < len(videos):
+        stream = videos[video_stream]
+        return normalize_fps(stream.get("avg_frame_rate") or stream.get("r_frame_rate") or "29.97")
     return "29.97"
 
 
-def extract_embedded_timecode(probe_meta: dict[str, Any]) -> dict[str, Any] | None:
+def extract_embedded_timecode(
+    probe_meta: dict[str, Any],
+    *,
+    video_stream: int = 0,
+) -> dict[str, Any] | None:
     """Read embedded TC, preferring the tmcd data stream over container tags."""
     tmcd_tc: str | None = None
     tmcd_index: int | None = None
@@ -58,7 +63,7 @@ def extract_embedded_timecode(probe_meta: dict[str, Any]) -> dict[str, Any] | No
     if not tc_value:
         return None
 
-    fps = _video_fps(probe_meta)
+    fps = _video_fps(probe_meta, video_stream=video_stream)
     drop_frame = TIMECODE_RE.match(str(tc_value).strip()) is not None and ";" in str(tc_value)
     return {
         "timecode": str(tc_value),

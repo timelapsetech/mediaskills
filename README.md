@@ -2,7 +2,7 @@
 
 Open-source [Agent Skills](https://agentskills.io) for media processing — portable instructions and scripts that help AI agents work with video, audio, images, captions, and broadcast formats.
 
-[![Skills](https://img.shields.io/badge/skills-13-blue)](skills/index.json)
+[![Skills](https://img.shields.io/badge/skills-14-blue)](skills/index.json)
 [![Tests](https://img.shields.io/badge/tests-102%2B-green)](./scripts/smoke.sh)
 [![Spec](https://img.shields.io/badge/agentskills.io-compliant-purple)](https://agentskills.io/specification)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -15,8 +15,8 @@ Open-source [Agent Skills](https://agentskills.io) for media processing — port
 Read [AGENTS.md](AGENTS.md) for skill routing. Machine-readable catalog: [skills/index.json](skills/index.json).
 
 ```bash
-npx skills add timelapsetech/mediaskills@v0.1.1 --skill install-media-tools
-npx skills add timelapsetech/mediaskills@v0.1.1 --skill inspect
+npx skills add timelapsetech/mediaskills@v0.1.2 --skill install-media-tools
+npx skills add timelapsetech/mediaskills@v0.1.2 --skill inspect
 bash skills/install-media-tools/scripts/doctor.sh
 ```
 
@@ -24,16 +24,16 @@ bash skills/install-media-tools/scripts/doctor.sh
 
 ```bash
 # List available skills
-npx skills add timelapsetech/mediaskills@v0.1.1 --list
+npx skills add timelapsetech/mediaskills@v0.1.2 --list
 
-# Install all skills (pin @v0.1.1 for reproducibility)
-npx skills add timelapsetech/mediaskills@v0.1.1 --all
+# Install all skills (pin @v0.1.2 for reproducibility)
+npx skills add timelapsetech/mediaskills@v0.1.2 --all
 
 # Install one skill
-npx skills add timelapsetech/mediaskills@v0.1.1 --skill inspect
+npx skills add timelapsetech/mediaskills@v0.1.2 --skill inspect
 
 # Install globally
-npx skills add timelapsetech/mediaskills@v0.1.1 -g --skill audio
+npx skills add timelapsetech/mediaskills@v0.1.2 -g --skill audio
 ```
 
 ## System dependencies
@@ -48,13 +48,13 @@ Python scripts use [uv](https://docs.astral.sh/uv/) (`uv run scripts/foo.py`) wi
 | Skill | Extra requirements |
 | --- | --- |
 | `speech-captions` | faster-whisper (via `uv run`); models download on first use |
-| `image`, `vision-analysis` | tesseract, ImageMagick `convert` |
+| `image`, `vision-analysis`, `forced-narrative-exact` | tesseract; ImageMagick `convert` (image/vision-analysis) |
 | `download` | yt-dlp |
 | `timecode` | PyPI `timecode` (auto via `uv run`) |
 
 **Tested:** macOS, Ubuntu/Debian, Python 3.11–3.13, ffmpeg 6.x/7.x. See [CHANGELOG.md](CHANGELOG.md).
 
-## Skills (13)
+## Skills (14)
 
 | Skill | Description |
 | --- | --- |
@@ -69,7 +69,8 @@ Python scripts use [uv](https://docs.astral.sh/uv/) (`uv run scripts/foo.py`) wi
 | `subtitles` | Convert, shift, extract, burn subtitles |
 | `captions-compliance` | Caption rules, validation, SCC/SMPTE-TT export, busy zones |
 | `shots` | Shot/cut detection and midpoint frame extraction |
-| `program-master` | Black+silence gap segmentation and segment labeling |
+| `program-master` | Fade-aware black+silence segmentation, labeled manifests, thumbnail PDF reports |
+| `forced-narrative-exact` | Exhaustive frame-accurate burned-in dialogue inventory and completeness QC |
 | `vision-analysis` | Frame extraction, agent-guided analysis, on-screen text reports |
 
 Each `SKILL.md` includes when-to-use, gotchas, recipes, and **do not use for** boundaries.

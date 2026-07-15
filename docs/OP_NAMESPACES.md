@@ -15,6 +15,7 @@ Stable `op` values returned in JSON stdout. Generated from scripts — see `pyth
 | `download.*` | `skills/download/` |
 | `shots.*` | `skills/shots/` |
 | `program_master.*` | `skills/program-master/` |
+| `forced_narrative_exact.*` | `skills/forced-narrative-exact/` |
 | `vision.*` | `skills/vision-analysis/` |
 | `install-media-tools.*` | `skills/install-media-tools/` (bash) |
 

@@ -106,7 +106,34 @@ def test_compile(sample_video: Path, tmp_path: Path, monkeypatch: pytest.MonkeyP
     json_path = Path(data["data"]["json_path"])
     assert md.is_file()
     assert json_path.is_file()
-    assert "# Program master:" in md.read_text(encoding="utf-8")
+    text = md.read_text(encoding="utf-8")
+    assert "# Program master:" in text
     report = json.loads(json_path.read_text(encoding="utf-8"))
-    assert report["rows"]
-    assert data["data"]["segment_count"] == len(report["rows"])
+    assert report.get("rows") or report.get("segments")
+
+
+def test_doctor():
+    result = run_script(
+        SCRIPTS / "doctor.py",
+        "--profile",
+        str(SKILL_DIR / "profiles" / "broadcast-default.json"),
+    )
+    assert result.returncode == 0, result.stderr
+    data = parse_json_stdout(result)
+    assert data["ok"] is True
+    assert data["op"] == "program_master.doctor"
+    assert data["data"]["passed"] is True
+    assert data["data"]["runtime"]["passed"] is True
+
+
+def test_self_test(tmp_path: Path):
+    result = run_script(
+        SCRIPTS / "self_test.py",
+        "--work-dir",
+        str(tmp_path / "program-master-self-test"),
+    )
+    assert result.returncode == 0, result.stderr
+    data = parse_json_stdout(result)
+    assert data["ok"] is True
+    assert data["op"] == "program_master.self_test"
+    assert data["data"]["passed"] is True

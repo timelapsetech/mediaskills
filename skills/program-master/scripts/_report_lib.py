@@ -61,142 +61,46 @@ def _parse_episode_meta(segments: list[dict[str, Any]], probes: list[dict[str, A
     return meta
 
 
-def _find_episode_bounds(segments: list[dict[str, Any]]) -> tuple[int | None, int | None]:
-    """Return (first_episode_part_index, last_episode_part_index) using embedded hour mark."""
-    episode_indices: list[int] = []
-    for seg in segments:
-        if seg.get("segment_type") != "content":
-            continue
-        start_tc = seg.get("start_timecode") or ""
-        if not start_tc:
-            continue
-        if start_tc >= "01:00:00;00" and start_tc < "01:43:05;00":
-            episode_indices.append(seg["index"])
-        elif start_tc.startswith("01:43:0") and float(seg.get("duration") or 0) >= 300:
-            episode_indices.append(seg["index"])
-    if not episode_indices:
-        return None, None
-    return episode_indices[0], episode_indices[-1]
-
-
 def derive_display_label(
     seg: dict[str, Any],
     *,
-    segments: list[dict[str, Any]],
-    episode_start: int | None,
-    episode_end: int | None,
-    post_program_start: int | None,
-    episode_part_counter: dict[int, int],
+    content_number: int,
+    label_mode: str = "generic",
+    label_overrides: dict[int, str] | None = None,
 ) -> str:
-    idx = seg.get("index", 0)
+    idx = int(seg.get("index", 0))
     seg_type = seg.get("segment_type") or "content"
     raw_label = (seg.get("label") or "").strip()
-    duration = float(seg.get("duration") or 0)
-
+    overrides = label_overrides or {}
+    if idx in overrides:
+        return overrides[idx]
     if seg_type == "gap":
-        if episode_start is not None and idx < episode_start:
-            if idx == 3:
-                return "black+silent (before slate)"
-            return "black+silent"
-        if (
-            episode_start is not None
-            and episode_end is not None
-            and episode_start <= idx <= episode_end
-        ):
-            return "break"
-        if episode_end is not None and idx > episode_end and (
-            post_program_start is None or idx < post_program_start
-        ):
-            return "black+silent (credits)"
-        if post_program_start is not None and idx >= post_program_start:
-            return "black+silent (break)"
-        return "black+silent"
-
-    # content
-    if idx == 0:
-        return "SMPTE leader"
-    if episode_start is not None and idx < episode_start:
-        if raw_label == "unlabeled":
-            return "bars/transition"
-        return _summarize_ocr_label(raw_label) or "pre-roll"
-
-    if episode_start is not None and episode_end is not None and episode_start <= idx <= episode_end:
-        part = episode_part_counter.get(idx)
-        if part:
-            suffix = " (final act)" if idx == episode_end else ""
-            return f"Episode Part {part}{suffix}"
-        return "episode content"
-
-    # credits roll (short OCR-labeled cards)
-    if episode_end is not None and idx > episode_end and (post_program_start is None or idx < post_program_start):
-        if raw_label not in ("content", "unlabeled", ""):
-            summary = _summarize_ocr_label(raw_label)
-            if summary:
-                return f"credits — {summary}"
-        if raw_label == "unlabeled" and duration < 3:
-            return "credits — transition"
-        if duration < 10 and raw_label == "content":
-            return "credits — end card"
-        return "credits"
-
-    # post-program
-    if post_program_start is not None and idx >= post_program_start:
-        if raw_label not in ("content", "unlabeled", ""):
-            summary = _summarize_ocr_label(raw_label)
-            if summary:
-                return f"post-program — {summary}"
-        # enumerate post-program content blocks
-        post_content = [
-            s["index"]
-            for s in segments
-            if s.get("segment_type") == "content" and s["index"] >= post_program_start
-        ]
-        try:
-            n = post_content.index(idx) + 1
-        except ValueError:
-            n = 0
-        if duration >= 60:
-            return f"post-program segment {n}"
-        return f"post-program clip {n}"
-
-    return _summarize_ocr_label(raw_label) or raw_label or "content"
+        return "black+silent separator"
+    summary = _summarize_ocr_label(raw_label)
+    if summary:
+        return summary
+    if label_mode == "raw" and raw_label:
+        return raw_label
+    return f"content segment {content_number}"
 
 
-def build_report_rows(manifest: dict[str, Any]) -> list[dict[str, Any]]:
+def build_report_rows(
+    manifest: dict[str, Any],
+    *,
+    label_mode: str = "generic",
+    label_overrides: dict[int, str] | None = None,
+) -> list[dict[str, Any]]:
     segments = manifest.get("segments") or []
-    probes = manifest.get("probes") or []
-    episode_start, episode_end = _find_episode_bounds(segments)
-
-    # Post-program starts after credits cluster (first long content after 01:43:50 with duration > 5s past credits)
-    post_program_start: int | None = None
-    if episode_end is not None:
-        for seg in segments:
-            if seg.get("segment_type") != "content" or seg["index"] <= episode_end:
-                continue
-            start_tc = seg.get("start_timecode") or ""
-            if start_tc >= "01:43:45;00" and float(seg.get("duration") or 0) >= 5:
-                post_program_start = seg["index"]
-                break
-
-    episode_part_counter: dict[int, int] = {}
-    if episode_start is not None and episode_end is not None:
-        part = 0
-        for seg in segments:
-            if seg.get("segment_type") != "content":
-                continue
-            if episode_start <= seg["index"] <= episode_end:
-                part += 1
-                episode_part_counter[seg["index"]] = part
-
     rows: list[dict[str, Any]] = []
+    content_number = 0
     for seg in segments:
+        if seg.get("segment_type") == "content":
+            content_number += 1
         display_label = derive_display_label(
             seg,
-            segments=segments,
-            episode_start=episode_start,
-            episode_end=episode_end,
-            post_program_start=post_program_start,
-            episode_part_counter=episode_part_counter,
+            content_number=content_number,
+            label_mode=label_mode,
+            label_overrides=label_overrides,
         )
         duration_seconds = float(seg.get("duration") or 0)
         rows.append(
@@ -213,35 +117,39 @@ def build_report_rows(manifest: dict[str, Any]) -> list[dict[str, Any]]:
                 "raw_label": seg.get("label"),
                 "label_source": seg.get("label_source"),
                 "probe_frame_path": seg.get("probe_frame_path"),
+                "boundary_evidence": seg.get("boundary_evidence"),
             }
         )
     return rows
 
 
-def build_report(manifest: dict[str, Any]) -> dict[str, Any]:
+def build_report(
+    manifest: dict[str, Any],
+    *,
+    label_mode: str = "generic",
+    label_overrides: dict[int, str] | None = None,
+) -> dict[str, Any]:
     source = manifest.get("input_path") or "program"
     episode_meta = _parse_episode_meta(manifest.get("segments") or [], manifest.get("probes") or [])
-    rows = build_report_rows(manifest)
-
-    episode_start_tc = None
-    episode_end_tc = None
-    for row in rows:
-        if row["label"].startswith("Episode Part 1"):
-            episode_start_tc = row["start_tc"]
-        if "final act" in row["label"]:
-            episode_end_tc = row["end_tc"]
+    rows = build_report_rows(
+        manifest,
+        label_mode=label_mode,
+        label_overrides=label_overrides,
+    )
 
     return {
+        "schema_version": "2.0",
         "source": source,
         "source_filename": Path(source).name,
         "duration_seconds": manifest.get("duration"),
         "timecode_mode": manifest.get("timecode_mode"),
         "embedded_timecode": manifest.get("embedded_timecode"),
         "fps": manifest.get("fps"),
+        "black_detection": manifest.get("black_detection"),
+        "effective_config": manifest.get("effective_config"),
+        "provenance": manifest.get("provenance"),
         "episode": {
             **episode_meta,
-            "start_tc": episode_start_tc,
-            "end_tc": episode_end_tc,
         },
         "segment_count": len(rows),
         "rows": rows,
@@ -249,6 +157,9 @@ def build_report(manifest: dict[str, Any]) -> dict[str, Any]:
 
 
 def render_markdown_report(report: dict[str, Any]) -> str:
+    def cell(value: Any) -> str:
+        return str(value if value is not None else "").replace("|", "\\|").replace("\n", "<br>")
+
     lines = [
         f"# Program master: {report.get('source_filename', 'program')}",
         "",
@@ -282,7 +193,7 @@ def render_markdown_report(report: dict[str, Any]) -> str:
     )
     for row in report.get("rows") or []:
         lines.append(
-            f"| {row['index']} | {row['type']} | {row['start_tc']} | {row['end_tc']} | "
-            f"{row['duration']} | {row['label']} |"
+            f"| {cell(row['index'])} | {cell(row['type'])} | {cell(row['start_tc'])} | "
+            f"{cell(row['end_tc'])} | {cell(row['duration'])} | {cell(row['label'])} |"
         )
     return "\n".join(lines) + "\n"

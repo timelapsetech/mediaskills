@@ -4,6 +4,20 @@ All notable changes to this project are documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [0.1.2] - 2026-07-15
+
+### Added
+
+- `forced-narrative-exact` skill: dense caption-band OCR discovery, agent-verified seeds, source-frame boundary refinement, Markdown/JSON/CSV/SRT delivery, and texted/textless completeness audit
+- `program-master` doctor, self-test, profile-driven `run_report.py` delivery bundle, thumbnail-led PDF reports, and versioned `profiles/broadcast-default.json`
+- Workflows for program-master segment reports and exact forced-narrative inventories
+
+### Changed
+
+- `program-master` upgraded to fade-aware separators, provenance/QC manifests, and fail-closed bundle validation
+- Agent routing and docs distinguish `forced-narrative-exact` (exact burned-in dialogue) from `vision-analysis` (broader on-screen text/graphics)
+- Shared `main_wrapper` now maps subprocess and runtime failures to the JSON error contract
+
 ## [0.1.1] - 2026-07-06
 
 ### Added
@@ -41,5 +55,6 @@ Format based on [Keep a Changelog](https://keepachangelog.com/). Versioning foll
 - `video-transformation` renamed from `video-editing`
 - `timecode` skill replaces earlier `smpte` (drop-frame support via eoyilmaz/timecode)
 
+[0.1.2]: https://github.com/timelapsetech/mediaskills/releases/tag/v0.1.2
 [0.1.1]: https://github.com/timelapsetech/mediaskills/releases/tag/v0.1.1
 [0.1.0]: https://github.com/timelapsetech/mediaskills/releases/tag/v0.1.0

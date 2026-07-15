@@ -43,6 +43,13 @@ def build_parser() -> argparse.ArgumentParser:
         default=0.5,
         help="Minimum silence length in seconds (default 0.5)",
     )
+    parser.add_argument("--audio-stream", type=int, default=0, help="Relative audio stream index")
+    parser.add_argument(
+        "--audio-policy",
+        choices=["single", "all"],
+        default="single",
+        help="Analyze one stream or require silence across all audio streams",
+    )
     return parser
 
 
@@ -56,6 +63,8 @@ def main() -> None:
         str(path),
         noise=str(args.noise),
         min_duration=float(args.min_duration),
+        audio_stream=int(args.audio_stream),
+        audio_policy=str(args.audio_policy),
     )
 
     out = resolve_output(str(path), "_silences.json", args.output)
@@ -64,6 +73,8 @@ def main() -> None:
         "segments": segments,
         "silences": segments,
         "count": len(segments),
+        "audio_policy": str(args.audio_policy),
+        "audio_stream": int(args.audio_stream),
     }
     out.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 

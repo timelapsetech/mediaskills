@@ -1,8 +1,8 @@
 ---
 name: program-master
-description: TV program segmentation — detect black+silent break separators, probe boundary frames, and label content segments (including slate-driven labels). Use when finding commercial breaks, naming episodes/parts, or mapping broadcast master structure — not hard cuts inside content.
+description: TV program segmentation — detect fade-aware black+silent break separators, preserve frame-accurate fade anchors, label content segments, and generate validated thumbnail-led broadcast segment PDF reports. Use when finding commercial breaks, naming episodes/parts, mapping broadcast master structure, or delivering a visual segment report — not hard cuts inside content.
 license: MIT
-compatibility: Requires ffmpeg and ffprobe on PATH. Optional tesseract for OCR slate text. Scripts are Python 3.11+, run via `uv run` (`timecode` PyPI package for embedded SMPTE mapping).
+compatibility: Requires Python 3.11+, uv, ffmpeg, and ffprobe on PATH. Tesseract is governed by the selected OCR policy. Scripts use exact pinned PEP 723 dependencies via `uv run`.
 metadata:
   mediaskills-category: video
   mediaskills-binaries: ffmpeg, ffprobe, tesseract
@@ -10,7 +10,15 @@ metadata:
 
 # Program Master
 
-TV program segmentation: detect black+silent break separators, probe boundary frames, and label content segments (including slate-driven labels).
+Build a full-coverage broadcast-master structure report from black+silent separators. The canonical workflow produces a labeled manifest, Markdown, structured JSON, a thumbnail-led PDF, and a machine-readable QC result in one run.
+
+Requires Python 3.11+, `uv`, ffmpeg, and ffprobe. Tesseract is governed by the selected OCR policy. Python dependencies are exactly pinned in the executable scripts.
+
+Run the bundled doctor before first use on a new system:
+
+```bash
+uv run scripts/doctor.py --profile profiles/broadcast-default.json
+```
 
 ## Shots vs program-master
 
@@ -19,143 +27,160 @@ TV program segmentation: detect black+silent break separators, probe boundary fr
 | What are you finding? | Structural gaps between programs/parts (black + silent breaks) | Hard cuts inside content (camera angle changes, edits) |
 | Typical source | TV master with black+silent separators | Any edited video |
 | Output unit | Content segments with labels (episode, commercial, slate text) | Shot list with timecodes |
-| Detection method | ffmpeg `blackdetect` + `silencedetect` overlap | ffmpeg `select=gt(scene,N)` |
+| Detection method | ffmpeg `blackdetect` + `silencedetect` overlap + fade refinement | ffmpeg `select=gt(scene,N)` |
 
-Use **program-master** when the user asks to **label segments**, **identify program structure**, **find commercial breaks**, or **name episodes/parts** in a TV master — especially when breaks are marked by **black video with silence**. Do **not** use shot detection for this; shots find hard cuts inside content, not broadcast separators.
+## Use the canonical workflow
 
-## When to use
-
-- Label TV segments from a broadcast master
-- Find commercial breaks or part boundaries
-- Name episodes from slate cards before/after black gaps
-- QC black levels and silence at program boundaries
-
-## Output paths
-
-Manifests, probe JPGs, and compiled reports write to the **workspace root** `.mediaskills/generated/` (not inside this skill folder). Override with `$MEDIASKILLS_DATA_DIR/generated/` when set.
-
-## Scripts
-
-| Script | Purpose |
-| --- | --- |
-| `label_segments.py` | **Primary.** Black+silence detect → probe frame before each gap → OCR slate text → labeled segment manifest |
-| `detect_black_silence.py` | Black **and** silent overlap regions only (no frames/labels) |
-| `detect_blacks.py` | Black video regions (ffmpeg `blackdetect`) |
-| `detect_silence.py` | Silent audio regions (ffmpeg `silencedetect`) |
-| `analyze_structure.py` | Legacy: silence-based cuts without labeling |
-| `compile.py` | **Deliverable.** Human-readable Markdown table + structured JSON report |
-| `schema.py` | Segment manifest JSON schema |
-
-## Preferred recipe: label TV segments
+Run this command for normal delivery work:
 
 ```bash
-uv run scripts/label_segments.py --input /path/to/master.mov
-uv run scripts/compile.py --structure-path .mediaskills/generated/*_labeled_segments.json
+uv run scripts/run_report.py \
+  --input /absolute/path/master.mov \
+  --output-dir /absolute/path/report_bundle \
+  --profile profiles/broadcast-default.json
 ```
 
-**Always run both steps.** Present the compiled Markdown table to the user and cite the companion `*_program_master_report.json`.
+Add `--label-overrides /absolute/path/labels.json` when editorial names are known. Do not assemble a final delivery by calling the detector and compiler scripts independently; those scripts are diagnostic components of `run_report.py`.
 
-## Agent deliverable format
+The one-command workflow must finish with `passed: true`. It writes stable names under the requested output directory:
 
-After `compile.py`, present **all segments** (pre-roll through tail black) in this table — never truncate at episode end:
+- `*_labeled_segments.json` — authoritative structural manifest and evidence
+- `*_program_master.md` — complete user-readable table
+- `*_program_master_report.json` — table data and provenance
+- `*_broadcast_segment_report.pdf` — thumbnail-led visual report
+- `*_broadcast_segment_report.json` — thumbnail selections and evidence
+- `*_qc.json` — all structural, timecode, thumbnail, PDF, and source-hash checks
+- `*_run.json` — bundle index and effective configuration
+- `*_segment_probes/` and `*_broadcast_segment_report_thumbnails/` — visual evidence
+
+Present the Markdown table and link the PDF, JSON report, manifest, and QC artifact. Never present a bundle whose QC did not pass.
+
+## Repeatability contract
+
+Every run must make these choices explicit in the profile or command:
+
+- selected relative video stream
+- either one selected audio stream or `all` audio streams
+- embedded or file-relative timecode policy, including whether embedded timecode is mandatory
+- OCR mode: `off`, `optional`, or `required`, plus language and PSM
+- detector thresholds, fade policy, minimum overlap, and probe offset
+- generic/raw label policy and whether every content row requires an editorial override
+- expected minimum gap count and PDF layout policy
+
+The manifest records the effective configuration, selected streams, authoritative video duration source, source SHA-256, profile SHA-256, tool versions, command, algorithm version, and schema version. Preserve these fields. Do not hand-edit detected timecodes or segment boundaries; rerun from a versioned profile.
+
+The selected video stream is the duration authority. Segment intervals are start-inclusive and end-exclusive, begin at source frame zero, are contiguous, and cover the selected video through its exclusive final frame. The workflow fails closed on detector errors, missing required streams, a missing required tmcd, incomplete coverage, invalid overrides, missing thumbnails, or an invalid PDF.
+
+## Profile and policy
+
+Start with [`profiles/broadcast-default.json`](profiles/broadcast-default.json). Copy it into the report bundle when a project needs custom thresholds or policies; give the copy a descriptive `name` and keep `profile_version: "1.0"`.
+
+Important examples:
+
+```json
+{
+  "streams": {"video_stream": 0, "audio_policy": "all", "audio_stream": 0},
+  "timecode": {"mode": "embedded", "require_embedded": true, "file_fps": 29.97},
+  "ocr": {"mode": "required", "language": "eng", "psm": 6},
+  "labels": {"mode": "generic", "overrides": {}, "require_overrides_for_content": true},
+  "validation": {"min_gaps": 3}
+}
+```
+
+Use `audio_policy: "single"` only when that program mix is the declared structure authority. Use `all` when every audio track must be silent before a region is considered a separator. `optional` OCR permits a run without Tesseract and records availability; `required` fails instead of silently degrading.
+
+For broadcast delivery, prefer embedded tmcd and set `require_embedded: true` when the source is expected to carry it. File-relative timecode is permitted only when the policy explicitly allows it. Never substitute nominal 30 fps for 30000/1001.
+
+## Editorial labels
+
+Detection does not infer show-specific labels from segment numbers or hardcoded timecodes. Without overrides, content rows receive deterministic generic labels; readable OCR may supply a slate label. Gap rows are `black+silent separator`.
+
+`--label-overrides` accepts any of:
+
+```json
+{"0": "Color bars / reference tone", "4": "Program Act 1 (texted)"}
+```
+
+```json
+{"labels": {"0": "Color bars / reference tone", "4": "Program Act 1 (texted)"}}
+```
+
+It also accepts an existing report containing `rows` or `segments` with `index` and `label`. Unknown indices and empty labels fail. Set `labels.require_overrides_for_content` to `true` when all content names must be editorially approved. The report records the override file path and SHA-256.
+
+## Boundary and fade policy
+
+The detector finds overlap between strict black picture and silence, then refines black edges at native-frame luma resolution:
+
+1. ffmpeg `blackdetect` uses strict black (`pix_th: 0.01`, `pic_th: 0.98` by default).
+2. `silencedetect` runs on the declared audio stream policy.
+3. Only overlaps meeting `min_overlap` become structural gaps.
+4. Hard cuts stay on the detected cut.
+5. A sustained luma ramp proves a fade; the mathematical black anchor is assigned to the adjoining content using `fade_handle_frames`.
+6. A terminal gap within two frames of the selected video end is extended to that exclusive end.
+
+Silence gates structural gaps but does not erase a picture fade. This preserves the true start of content even when its first included fade frame is visually black. Keep boundary timecodes distinct from thumbnail selection.
+
+## Thumbnail PDF policy
+
+Every content row has one source thumbnail at the start of the row. Gap rows use an intentional black+silent placeholder.
+
+- Clean cut or intentional card: segment-start frame.
+- Audio resumes while picture remains black: first picture after the proven black hold.
+- Proven fade-up: first sustained upper-luma plateau within the configured search window.
+
+The companion JSON records the chosen source frame, SMPTE timecode, offset from segment start, selection reason, and thumbnail path. Thus a faded content segment can correctly start at `01:00:00:00` while its report thumbnail shows the first fully established picture.
+
+After generation, visually inspect every PDF page for clipped text, missing images, wrong row order, or illegible layout. Machine QC is mandatory but does not replace visual PDF QA.
+
+## Report format
+
+The Markdown report contains every structural row through tail black:
 
 | # | Type | Start TC | End TC | Duration | Label |
 | --- | --- | --- | --- | --- | --- |
-| 0 | content | 00:58:40;00 | 00:59:40;00 | 60s | SMPTE leader |
-| 1 | gap | 00:59:40;00 | 00:59:45;00 | 5s | black+silent |
-| 4 | content | 01:00:00;00 | 01:10:08;00 | 10:08 | Episode Part 1 |
-| … | … | … | … | … | … |
-| 86 | content | 02:05:32;08 | 02:06:01;02 | 29s | post-program clip 32 |
+| 0 | content | 00:58:40:00 | 00:59:40:00 | 1:00 | Color bars / reference tone |
+| 1 | gap | 00:59:40:00 | 00:59:45:00 | 5s | black+silent separator |
 
-Rules for the agent:
+Use the report’s timecodes exactly. Do not add a speaker/context column. Do not omit pre-roll, slates, gaps, credits, post-program material, or tail black.
 
-1. **Timecodes** — use embedded DF SMPTE from the manifest (`start_tc` / `end_tc` in report JSON). Frame-accurate; never file-relative `00:00:00:00` on broadcast masters.
-2. **Duration** — human format from `compile.py`: `M:SS` when ≥ 60s, else `Ns` (e.g. `10:08`, `5s`).
-3. **Labels** — use `compile.py` display labels. Episode parts, credits OCR summaries, and numbered post-program clips. Refine with **vision-analysis** on probe frames when OCR is thin.
-4. **Full coverage** — include every row through the final tail gap; post-credit promos/breaks get `post-program segment N` or `post-program clip N` labels at minimum.
-5. **JSON** — the paired `*_program_master_report.json` has the same `rows` array plus `episode` metadata (series, title, TRT, body TC range).
+## Diagnostic scripts
 
-Example outputs ship with the skill run under `.mediaskills/generated/*_program_master.md` and `*_program_master_report.json`. Reference example: `.mediaskills/generated/examples/AEN_SWRS_program_master_example.md` (and `.json`).
+| Script | Purpose |
+| --- | --- |
+| `run_report.py` | Canonical orchestration and final delivery bundle |
+| `label_segments.py` | Detect, refine, probe, label, timecode, provenance, manifest validation |
+| `compile.py` | Markdown and structured JSON from a validated manifest |
+| `compile_pdf.py` | Deterministic thumbnail-led PDF and companion JSON |
+| `validate_report.py` | Fail-closed final bundle QC |
+| `self_test.py` | Self-contained synthetic golden test, including deterministic PDF comparison |
+| `doctor.py` | Runtime readiness: binaries, profile, OCR policy, pinned dependencies |
+| `detect_black_silence.py` | Diagnostic black+silence overlap intervals |
+| `detect_blacks.py` | Diagnostic black intervals |
+| `detect_silence.py` | Diagnostic silence intervals |
+| `schema.py` | Manifest JSON schema |
+| `analyze_structure.py` | Legacy diagnostic; not a delivery workflow |
 
-1. Detects gaps where **black video and silent audio overlap** (default min 0.5s).
-2. For each gap, extracts a still **`--probe-offset-seconds` before gap start** (default **1.0s**).
-3. Runs **tesseract OCR** on each probe frame (when installed).
-4. Classifies each probe as:
-   - **`content`** — no slate-like text; labels the **segment ending at the gap** as `content`.
-   - **`slate`** — readable title-card text; labels the **segment after the gap** with the extracted text.
-5. Writes `*_labeled_segments.json` plus probe JPGs under `.mediaskills/generated/<stem>_segment_probes/`.
-6. When a **tmcd** embedded timecode track is present, maps segment boundaries to **drop-frame SMPTE** (`HH:MM:SS;FF`) using the file's start TC and exact video frame rate (`30000/1001`, not rounded 30).
+Run the golden test after changing code, thresholds, dependencies, schema, timecode, or rendering:
 
-Present the **full** compiled table (see Agent deliverable format above) — not the raw manifest with OCR dumps.
+```bash
+uv run scripts/self_test.py --work-dir /absolute/path/program-master-self-test
+```
 
-### Embedded timecode (broadcast masters)
+It synthesizes a tmcd MOV with hard cuts, black+silent gaps, a fade-up, and tail black; runs the complete workflow twice; verifies structure, embedded start timecode, fade thumbnail selection, source provenance, QC, PDF readability, and byte-identical deterministic PDFs.
 
-For `.mov` / ProRes masters with a **tmcd** track, `label_segments.py` defaults to `--timecode-mode embedded`:
+## Human QC before delivery
 
-1. Read start TC from the **tmcd stream** (fallback: container `timecode` tag) via ffprobe.
-2. Read exact fps from the video stream (`avg_frame_rate` / `r_frame_rate`, e.g. `30000/1001`).
-3. Convert each segment's file-relative seconds to frames: `round(seconds × fps_exact)`.
-4. Add that frame offset to the embedded start TC (DF arithmetic via the `timecode` library).
-
-Manifest fields:
-
-- `start_timecode` / `end_timecode` — **embedded** SMPTE (authoritative for edit decisions)
-- `start_timecode_file` / `end_timecode_file` — file-relative TC from 00:00:00:00 (for ffmpeg `-ss`)
-- `embedded_timecode` — `{ timecode, fps, drop_frame, source, stream_index }`
-- `timecode_mode` — `embedded` or `file`
-
-Use **`timecode.extract`** first on unknown masters to confirm start TC and fps before trusting segment labels.
-
-### Optional: refine slates with agent vision
-
-When tesseract misses stylized slates or misclassifies graphics:
-
-1. Build a frame list from `probes[].frame_path` in the labeled JSON.
-2. Use the **vision-analysis** skill: the agent analyzes those stills, or run `image.ocr.py` per frame if vision is unavailable.
-3. Re-read title/graphic text; update segment labels in the JSON and re-run `compile.py`.
-
-## Parameters (`label_segments.py` / `detect_black_silence.py`)
-
-| Flag | Default | Meaning |
-| --- | --- | --- |
-| `--noise` | `-30dB` | Silence threshold for `silencedetect` |
-| `--min-duration` | `0.5` | Minimum gap length (seconds) |
-| `--pixel-threshold` | `0.10` | Black pixel ratio for `blackdetect` |
-| `--min-overlap` | `0.25` | Min seconds black **and** silence must overlap |
-| `--probe-offset-seconds` | `1.0` | How far before each gap to grab the boundary still |
-| `--fps` | `29.97` | File-relative TC fps when no embedded track (or override) |
-| `--timecode-mode` | `embedded` | `embedded` (use tmcd when present) or `file` (00:00:00:00 origin) |
-
-## Segment manifest fields
-
-Each **content** segment may include:
-
-- `label` — `content`, slate text, or `unlabeled`
-- `label_source` — `probe_before_gap`, `slate_before_gap`, or `none`
-- `segment_type` — `content` or `gap`
-- `probe_frame_path` / `slate_text` — evidence for the label
-- `start_timecode` / `end_timecode` — embedded SMPTE when `timecode_mode: embedded`
-- `start_timecode_file` / `end_timecode_file` — file-origin SMPTE (ffmpeg trim points)
-
-**Gap** segments (`segment_type: gap`) are the black+silent separators themselves.
-
-## Gotchas
-
-- **Do not use 30 fps for 29.97 DF masters** — always use the exact rational from ffprobe (`30000/1001`). Rounding to 30 drifts ~4 seconds per hour and misaligns episode boundaries vs slate TRT.
-- **Proxies lack tmcd** — a re-encoded proxy has no embedded TC track; run `label_segments.py` on the **source master** for authoritative SMPTE, or pass `--timecode-mode file` on proxies.
-- Broadcast masters without black+silent breaks (e.g. streaming with embedded SCTE markers only) may need different tooling.
-- Short flashes of black without matching silence are filtered out by `--min-overlap`.
-- OCR quality depends on slate contrast and tesseract language packs.
-- `analyze_structure.py` is legacy — prefer `label_segments.py` for TV masters with black gaps.
+1. Read `*_qc.json`; require top-level `passed: true` and no errors.
+2. Confirm the source SHA-256 and selected stream policy match the requested master.
+3. Review every detected boundary and every `fade_in_detected` / `fade_out_detected` edge against nearby source frames when the edit decision is consequential.
+4. Confirm labels cover the intended content rows and come from the approved override file when required.
+5. Inspect every PDF page visually.
+6. Confirm the first segment begins at source frame zero and the final row ends at the authoritative video duration.
 
 ## Do not use for
 
-- Per-shot creative editing decisions (use `video-transformation` with shot times)
-- Automatic transcription or captions
+- hard cuts or camera shots inside content (use `shots`)
+- subtitle or caption transcription (use `forced-narrative-exact` or `vision-analysis`)
+- SCTE-only segmentation without black+silent structural evidence
 
-## Related skills
-
-- `image` — `ocr.py` on a single probe still
-- `video-transformation` — `extract_frame.py` at a custom offset
-- `shots` — hard-cut detection inside a labeled content segment (different axis)
-- `timecode` — frame-accurate timecode math
+Related skills: `inspect`, `timecode`, `forced-narrative-exact`, `vision-analysis`, and `shots`.

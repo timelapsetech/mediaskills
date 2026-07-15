@@ -41,3 +41,5 @@ Requires `tesseract` on PATH.
 ## Related skills
 
 `inspect` → `vision-analysis`
+
+For exhaustive frame-accurate burned-in dialogue delivery, use [forced-narrative-exact](forced-narrative-exact.md) instead.

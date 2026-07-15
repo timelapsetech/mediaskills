@@ -11,7 +11,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SKILLS_ROOT = REPO_ROOT / "skills"
-VERSION = "0.1.1"
+VERSION = "0.1.2"
 
 OP_RE = re.compile(r"""op\s*=\s*["']([^"']+)["']|OP\s*=\s*["']([^"']+)["']""")
 PEP723_DEPS_RE = re.compile(r"dependencies\s*=\s*\[(.*?)\]", re.DOTALL)

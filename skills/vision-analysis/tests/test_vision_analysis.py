@@ -180,7 +180,8 @@ def test_get_frame_batch(sample_manifest: Path):
     assert data["data"]["has_more"] is True
 
 
-def test_list_extractions():
+def test_list_extractions(tmp_path: Path, monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("MEDIASKILLS_DATA_DIR", str(tmp_path))
     result = run_script(SCRIPTS / "list_extractions.py")
     assert result.returncode == 0, result.stderr
     data = parse_json_stdout(result)

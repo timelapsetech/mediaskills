@@ -41,9 +41,28 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--pixel-threshold",
         type=float,
-        default=0.10,
-        help="Black pixel ratio threshold for blackdetect (default 0.10)",
+        default=0.01,
+        help="Per-pixel black luma threshold; lower is stricter (default 0.01)",
     )
+    parser.add_argument(
+        "--picture-threshold",
+        type=float,
+        default=0.98,
+        help="Fraction of pixels that must be black (default 0.98)",
+    )
+    parser.add_argument(
+        "--fade-refine",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Refine gradual black transitions to mathematical anchor frames (default on)",
+    )
+    parser.add_argument(
+        "--fade-handle-frames",
+        type=int,
+        default=1,
+        help="Black anchor frames assigned to detected fades (default 1)",
+    )
+    parser.add_argument("--video-stream", type=int, default=0, help="Relative video stream index")
     return parser
 
 
@@ -51,12 +70,17 @@ def main() -> None:
     args = build_parser().parse_args()
     path = validate_input_path(args.input, OP)
     require_cmd("ffmpeg", OP)
+    require_cmd("ffprobe", OP)
 
     emit_progress("detecting blacks", 50)
     segments = detect_blacks(
         str(path),
         min_duration=float(args.min_duration),
         pixel_threshold=float(args.pixel_threshold),
+        picture_threshold=float(args.picture_threshold),
+        refine_fades=bool(args.fade_refine),
+        fade_handle_frames=max(0, int(args.fade_handle_frames)),
+        video_stream=int(args.video_stream),
     )
 
     out = resolve_output(str(path), "_blacks.json", args.output)
@@ -64,7 +88,14 @@ def main() -> None:
         "input_path": str(path),
         "segments": segments,
         "blacks": segments,
+        "black_detection": {
+            "pixel_threshold": float(args.pixel_threshold),
+            "picture_threshold": float(args.picture_threshold),
+            "fade_refine": bool(args.fade_refine),
+            "fade_handle_frames": max(0, int(args.fade_handle_frames)),
+        },
         "count": len(segments),
+        "video_stream": int(args.video_stream),
     }
     out.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
