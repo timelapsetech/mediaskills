@@ -86,6 +86,12 @@ Each cue becomes a timed full-frame PNG overlay; plan for longer encodes on capt
 | `scripts/extract.py` | Pull embedded subtitle track to SRT |
 | `scripts/burn.py` | Hardcode SRT captions into video |
 
+## Acceptance checks (agent must pass before delivery)
+
+1. Contract: exit 0, `ok: true`, every `output_paths` entry exists and is non-empty.
+2. Spot-check: after `shift.py`, first/last cue times moved by the requested offset; after `burn.py`, re-`inspect` and visually sample burned frames.
+3. On failure: fix timing/path and retry; do not deliver burn-in without opening at least one frame.
+
 ## Do not use for
 
 - Automatic speech recognition (use `speech-captions`)

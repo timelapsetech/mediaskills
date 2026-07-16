@@ -12,4 +12,4 @@ End-to-end command sequences for agents and humans.
 | [Exact forced-narrative inventory](forced-narrative-exact.md) | inspect → program-master → forced-narrative-exact |
 | [29.97 DF edit from timecode](timecode-df-edit.md) | timecode → video-transformation |
 
-Start with [AGENTS.md](../../AGENTS.md) for routing.
+Start with [AGENTS.md](../../AGENTS.md) for routing. Every workflow ends with a verification gate — do not deliver until it passes.

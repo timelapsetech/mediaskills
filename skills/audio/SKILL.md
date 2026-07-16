@@ -100,6 +100,13 @@ Read `data.silence_starts` / `data.silence_ends` (seconds) to split on pauses or
 
 Outputs default to the **workspace root** `.mediaskills/generated/` unless `--output` is set. Override with `$MEDIASKILLS_DATA_DIR/generated/` when set.
 
+## Acceptance checks (agent must pass before delivery)
+
+1. Contract: exit 0, `ok: true`, every `output_paths` entry exists and is non-empty.
+2. Probe: `inspect.describe` on each audio output — duration, sample rate, and format match the request.
+3. Spot-check: for trim/concat, duration ≈ sum of requested ranges; for normalize, listen/spot peaks are not clipped silence.
+4. On failure: fix or escalate; do not present empty or truncated audio as complete.
+
 ## Do not use for
 
 - Probing media metadata (use `inspect`)

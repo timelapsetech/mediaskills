@@ -4,6 +4,22 @@ All notable changes to this project are documented here.
 
 Format based on [Keep a Changelog](https://keepachangelog.com/). Versioning follows [Semantic Versioning](https://semver.org/).
 
+## [0.1.3] - 2026-07-16
+
+### Added
+
+- Agent **Always verify before deliver** protocol in `AGENTS.md`, plus **Acceptance checks** on every skill
+- `scripts/verify_output.py` for post-step path/duration gates
+- Semantic fixtures and tests: `cuts_3scene`, `program_gaps`, `burned_in_captions` (`scripts/generate_fixtures.py`, `tests/test_semantic.py`)
+- `forced-narrative-exact` `self_test.py`; `./scripts/smoke.sh --self-test` runs program-master and FNE golden self-tests
+- Verification gates on deliver / podcast / timecode / QC workflows
+
+### Changed
+
+- Local quality gate is the supported reliability path (`smoke.sh`, pre-push hook); GitHub Actions remains site-deploy only
+- Vision analysis: `validate_analysis.py` is required before report delivery
+- Docs and install pins updated to `@v0.1.3`; SUPPORT skill count corrected to 14
+
 ## [0.1.2] - 2026-07-15
 
 ### Added
@@ -41,20 +57,13 @@ Format based on [Keep a Changelog](https://keepachangelog.com/). Versioning foll
 
 ### Added
 
-- Initial public release: 13 Agent Skills for media processing
-- Skills: `install-media-tools`, `inspect`, `audio`, `image`, `video-transformation`, `download`, `timecode`, `speech-captions`, `subtitles`, `captions-compliance`, `shots`, `program-master`, `vision-analysis`
-- Consistent JSON script contract across Python CLIs
-- Local validation: `scripts/check.sh`, `scripts/smoke.sh`, `scripts/smoke_help.py`
-- Machine-readable catalog: `skills/index.json`, `scripts/list_ops.py`
+- Initial public release of mediaskills (Agent Skills for media processing)
+- Skills: install-media-tools, inspect, audio, image, video-transformation, download, timecode, speech-captions, subtitles, captions-compliance, shots, program-master, vision-analysis
+- Shared JSON script contract, op namespaces, golden fixtures
 - Agent routing: `AGENTS.md`, `docs/workflows/`, `docs/SCRIPT_CONTRACT.md`
-- Golden fixtures in `tests/fixtures/`
-- 102 pytest integration tests (whisper/network/install opt-in)
+- Local validation: `scripts/check.sh`, `scripts/smoke.sh`, `scripts/smoke_help.py`
 
-### Notes
-
-- `video-transformation` renamed from `video-editing`
-- `timecode` skill replaces earlier `smpte` (drop-frame support via eoyilmaz/timecode)
-
+[0.1.3]: https://github.com/timelapsetech/mediaskills/releases/tag/v0.1.3
 [0.1.2]: https://github.com/timelapsetech/mediaskills/releases/tag/v0.1.2
 [0.1.1]: https://github.com/timelapsetech/mediaskills/releases/tag/v0.1.1
 [0.1.0]: https://github.com/timelapsetech/mediaskills/releases/tag/v0.1.0

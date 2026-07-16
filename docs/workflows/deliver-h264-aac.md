@@ -24,6 +24,17 @@ uv run scripts/transcode.py \
 - Use `transcode.py` output `output_paths[0]` as the deliverable path.
 - For web, consider `--crf 23` instead of bitrate (see script `--help`).
 
+## Verification gate
+
+```bash
+# 3. Re-probe the deliverable (require H.264 + AAC; duration ≈ source)
+cd ../inspect
+uv run scripts/describe.py --input /path/to/deliverable.mp4
+uv run scripts/compare.py --input-a /path/to/master.mov --input-b /path/to/deliverable.mp4
+```
+
+Do not present the file as delivered until `ok: true`, the output exists, and codecs/duration match the request.
+
 ## Related skills
 
-`inspect` → `video-transformation`
+`inspect` → `video-transformation` → `inspect`

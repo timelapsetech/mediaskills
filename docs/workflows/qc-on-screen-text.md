@@ -16,7 +16,7 @@ uv run scripts/merge_analysis.py \
   --frames-json batch0.json \
   --analysis-path analysis.json
 
-# 3. Validate and report
+# 3. Validate (required) and report
 uv run scripts/validate_analysis.py --analysis-path analysis.json
 uv run scripts/text_on_screen_report.py --analysis-path analysis.json --force
 uv run scripts/forced_narrative_report.py --analysis-path analysis.json --force
@@ -37,6 +37,13 @@ Requires `tesseract` on PATH.
 
 - Vision analysis is **agent-guided** for `merge_analysis` path; scripts do not call vision APIs.
 - Use `get_frame_batch.py` to paginate large manifests.
+- Never skip `validate_analysis.py` before delivering reports.
+
+## Verification gate
+
+- `validate_analysis.py` exits 0 with `ok: true`
+- `analyzed_count` equals `frame_count` in the analysis / merge payload
+- Spot-check first, middle, and last frame rows in the report against source stills
 
 ## Related skills
 

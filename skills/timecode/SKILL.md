@@ -124,6 +124,12 @@ For full segment manifests with labels, prefer **`program-master`** `label_segme
 
 See [references/DF_NDF.md](references/DF_NDF.md) for drop-frame background.
 
+## Acceptance checks (agent must pass before delivery)
+
+1. Contract: exit 0, `ok: true`, and `data.seconds_realtime` / timecode fields present when converting for edits.
+2. Spot-check: DF vs NDF matches source (semicolon vs colon); seconds feed into trim and output duration ≈ (end − start).
+3. On failure: recalculate; do not trim on guessed seconds.
+
 ## Do not use for
 
 - Actual video trimming (convert to seconds, then use `video-transformation`)

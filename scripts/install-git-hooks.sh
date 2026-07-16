@@ -6,3 +6,4 @@ chmod +x .githooks/pre-push
 git config core.hooksPath .githooks
 echo "Installed git hooks from .githooks/ (core.hooksPath=.githooks)"
 echo "pre-push will run: ./scripts/smoke.sh"
+echo "Quality is local-only — GitHub Actions does not run pytest (site deploy only)."

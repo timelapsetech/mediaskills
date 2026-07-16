@@ -54,6 +54,16 @@ For labeled segment tables with embedded TC, use **program-master** `label_segme
 - Prefer `seconds_realtime` for ffmpeg on NTSC DF material.
 - See `skills/timecode/references/DF_NDF.md` for background.
 
+## Verification gate
+
+```bash
+# 4. Confirm trim duration ≈ (end − start) from to_seconds
+cd ../inspect
+uv run scripts/describe.py --input <trimmed_output>
+```
+
+Assert `data.duration` ≈ (`out_seconds` − `in_seconds`) within ~0.15s (container rounding). Re-run trim if not.
+
 ## Related skills
 
-`timecode` → `video-transformation`
+`timecode` → `video-transformation` → `inspect`

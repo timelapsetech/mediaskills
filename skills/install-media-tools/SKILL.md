@@ -154,6 +154,12 @@ uv --version
 | `scripts/detect-tools.sh` | List tools currently on PATH |
 | `scripts/which.sh` | Resolve full path for one tool name |
 
+## Acceptance checks (agent must pass before delivery)
+
+1. Contract: exit 0, `ok: true` from `doctor.sh` / `install.sh` JSON.
+2. Skill gate: re-run `doctor.sh` after install; required tools for the next skill are listed in `installed` (not `missing`).
+3. On failure: install missing tools or escalate; do not start media skills while core binaries are missing.
+
 ## Do not use for
 
 - Media processing itself (install tools, then use other skills)

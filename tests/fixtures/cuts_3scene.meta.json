@@ -1,0 +1,9 @@
+{
+  "expected_shot_count": 3,
+  "expected_cut_times_seconds": [
+    1.5,
+    3.0
+  ],
+  "duration_seconds": 4.5,
+  "notes": "Hard pattern cuts; shots.detect should report 3 shots"
+}

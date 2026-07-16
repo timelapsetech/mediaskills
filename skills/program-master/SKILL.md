@@ -168,6 +168,15 @@ uv run scripts/self_test.py --work-dir /absolute/path/program-master-self-test
 
 It synthesizes a tmcd MOV with hard cuts, black+silent gaps, a fade-up, and tail black; runs the complete workflow twice; verifies structure, embedded start timecode, fade thumbnail selection, source provenance, QC, PDF readability, and byte-identical deterministic PDFs.
 
+## Acceptance checks (agent must pass before delivery)
+
+Same fail-closed bar as **Human QC before delivery** below. Minimum automated gates:
+
+1. Contract: exit 0, `ok: true`, delivery paths exist.
+2. Skill gate: `*_qc.json` has `passed: true` and no errors; never present a failing bundle.
+3. Spot-check: first segment at frame zero, final row at video duration, review fade edges and every PDF page.
+4. On failure: fix overrides/thresholds and re-run `run_report.py`.
+
 ## Human QC before delivery
 
 1. Read `*_qc.json`; require top-level `passed: true` and no errors.

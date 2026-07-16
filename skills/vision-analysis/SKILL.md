@@ -68,7 +68,7 @@ uv run scripts/merge_analysis.py \
 
 # 4. Repeat step 2–3 for batch-index 1, 2, ... until all frames analyzed
 
-# 5. Optional validation
+# 5. Required validation (do not skip before reports)
 uv run scripts/validate_analysis.py --analysis-path .mediaskills/generated/program_frame_analysis_....json
 
 # 6. Reports
@@ -149,6 +149,14 @@ The second step filters OCR rows to burned-in dialogue and writes the forced-nar
 | `compile_report.py` | Legacy tesseract OCR |
 | `prepare_manifest.py` | Legacy interval manifests |
 | `list_extractions.py` / `compile_all_reports.py` | Inventory helpers |
+
+## Acceptance checks (agent must pass before delivery)
+
+1. Contract: exit 0, `ok: true`, every `output_paths` entry exists and is non-empty.
+2. Skill gate: run `validate_analysis.py` successfully **before** any delivery report (`text_on_screen_report`, `forced_narrative_report`, etc.).
+3. Coverage: `analyzed_count` equals `frame_count`; do not sample-deliver partial analysis.
+4. Spot-check: verify first/middle/last report rows against source frames; exclude hallucinated scene text from dialogue tables.
+5. On failure: re-merge or re-analyze; do not ship unvalidated reports. For exhaustive frame-accurate dialogue, prefer `forced-narrative-exact`.
 
 ## Do not use for
 

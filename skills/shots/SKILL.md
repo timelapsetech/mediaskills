@@ -80,6 +80,13 @@ The updated manifest lists every `frame_path` with per-frame technical metadata 
 
 Always use the `manifest_path` / `shots_path` from the JSON result for downstream steps — do not invent filenames.
 
+## Acceptance checks (agent must pass before delivery)
+
+1. Contract: exit 0, `ok: true`, manifest and any frames_dir exist.
+2. Spot-check: `shot_count` is plausible for the content; open 2–3 midpoint JPGs and confirm they fall inside distinct shots when cuts are expected.
+3. On hard-cut masters, assert known cut inventory when available; dissolves/fades may be missed — say so.
+4. On failure: retune `--threshold` / `--min-shot-seconds` or escalate; do not invent shot boundaries.
+
 ## Do not use for
 
 - Full program structure / act breaks (use `program-master`)

@@ -1,0 +1,15 @@
+{
+  "expected_text_contains": "HELLO",
+  "caption_band": {
+    "x": 0,
+    "y": 160,
+    "width": 320,
+    "height": 80
+  },
+  "text_visible_seconds": [
+    0.5,
+    2.0
+  ],
+  "duration_seconds": 3.0,
+  "notes": "Lower-third overlay PNG; FNE/OCR paths should discover HELLO"
+}

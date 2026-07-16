@@ -86,6 +86,14 @@ The JSON file can be the `json_path` from `transcribe.py` (it includes a top-lev
 | `scripts/to-srt.py` | Text or segments → SRT |
 | `scripts/to-vtt.py` | Text or segments → WebVTT |
 
+## Acceptance checks (agent must pass before delivery)
+
+1. Contract: exit 0, `ok: true`, SRT/JSON paths exist and are non-empty.
+2. Skill gate: hand off to `captions-compliance` `validate.py` before broadcast export.
+3. Spot-check: read first/last cues; language matches request; duration coverage roughly matches source audio (not a 2-second stub on a long file).
+4. ASR is imperfect — never claim verbatim accuracy without human/agent review of critical lines.
+5. On failure: re-transcribe with a clearer extract or escalate; do not deliver empty SRT.
+
 ## Do not use for
 
 - Burning subtitles into video (use `subtitles/burn.py`)

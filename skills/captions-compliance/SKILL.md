@@ -125,6 +125,14 @@ uv run scripts/to-captions-pipeline.py --input clip.mp4 --model tiny
 
 See [references/BROADCAST_GUIDELINES.md](references/BROADCAST_GUIDELINES.md) for context.
 
+## Acceptance checks (agent must pass before delivery)
+
+1. Contract: exit 0, `ok: true`, every `output_paths` entry exists and is non-empty.
+2. Skill gate: run `validate.py` before SCC/SMPTE-TT export; resolve blocking overlaps and timing issues (or document intentional residuals).
+3. Spot-check: first/last cues readable; SCC/TTML open in target NLE or viewer when available.
+4. Distributor specs still override heuristics — never claim legal certification from this skill alone.
+5. On failure: fix or escalate; do not export SCC from invalid timing.
+
 ## Do not use for
 
 - Legal caption certification

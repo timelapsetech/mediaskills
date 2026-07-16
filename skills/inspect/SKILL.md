@@ -93,6 +93,12 @@ Returns full probe JSON plus your question — the agent reads `data.probe.strea
 | `scripts/batch_probe.py` | Table of metadata for many files |
 | `scripts/ask.py` | Probe + question for agent reasoning |
 
+## Acceptance checks (agent must pass before delivery)
+
+1. Contract: exit 0, `ok: true`.
+2. Spot-check: duration/streams/codecs answer the user's question; use `compare.py` when verifying a transform result against its source.
+3. On failure: re-probe or escalate; do not invent metadata.
+
 ## Do not use for
 
 - Modifying or transcoding media (use `audio`, `image`, or `video-transformation`)

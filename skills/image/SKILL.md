@@ -109,6 +109,12 @@ uv run scripts/ocr.py --input screenshot.png
 | `scripts/strip_metadata.py` | Remove metadata, write clean copy |
 | `scripts/ocr.py` | Extract text with Tesseract |
 
+## Acceptance checks (agent must pass before delivery)
+
+1. Contract: exit 0, `ok: true`, every `output_paths` entry exists and is non-empty.
+2. Spot-check: open the output still — dimensions/format match request; OCR text is readable for the intended region when using `ocr.py`.
+3. On failure: fix or escalate; do not present zero-byte or wrong-geometry images as complete.
+
 ## Do not use for
 
 - Video timeline edits (use `video-transformation`)

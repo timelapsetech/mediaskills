@@ -1,0 +1,5 @@
+{
+  "expected_min_gap_count": 1,
+  "duration_seconds": 5.0,
+  "notes": "Black+silent middle second; program_master.detect_black_silence gap_count >= 1"
+}

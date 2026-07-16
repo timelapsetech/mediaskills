@@ -10,10 +10,10 @@ If the agent cannot view images, use the **legacy OCR path** (`compile_report.py
 2. **Batch frames** (script) — `get_frame_batch.py --manifest-path ... --batch-index N`
 3. **Analyze images** (agent) — read each `frame_path` image; produce JSON per frame (see below)
 4. **Merge results** (script) — `merge_analysis.py --manifest-path ... --frames-json batchN.json`
-5. **Validate** (script, optional) — `validate_analysis.py --analysis-path ...`
+5. **Validate** (script, **required before reports**) — `validate_analysis.py --analysis-path ...`
 6. **Reports** (script) — `text_on_screen_report.py`, `forced_narrative_report.py`, etc.
 
-Repeat steps 2–4 until `analyzed_count` equals `frame_count`.
+Repeat steps 2–4 until `analyzed_count` equals `frame_count`. Do not generate delivery reports until `validate_analysis.py` exits 0 with `ok: true`.
 
 ## Forced narrative report format
 

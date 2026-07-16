@@ -2,7 +2,7 @@
 
 ## What we support
 
-- **13 Agent Skills** for local media processing via ffmpeg and related tools
+- **14 Agent Skills** for local media processing via ffmpeg and related tools
 - **Python 3.11+** scripts run with `uv run`
 - **macOS and Linux** (Ubuntu/Debian) for `install-media-tools`
 - Spec compliance with [agentskills.io](https://agentskills.io)
@@ -17,7 +17,7 @@
 ## Getting help
 
 1. Run `bash skills/install-media-tools/scripts/doctor.sh` and fix missing binaries.
-2. Run `./scripts/smoke.sh --full` and include failures in your report.
+2. Run `./scripts/smoke.sh --full --self-test` locally and include failures in your report. (Tests are not run in GitHub Actions — only the doc site deploys there.)
 3. Open a [GitHub issue](https://github.com/timelapsetech/mediaskills/issues) with:
    - Skill name and script
    - Full command
@@ -27,7 +27,7 @@
 ## Version pinning
 
 ```bash
-npx skills add timelapsetech/mediaskills@v0.1.2 --skill inspect
+npx skills add timelapsetech/mediaskills@v0.1.3 --skill inspect
 ```
 
 See [CHANGELOG.md](CHANGELOG.md) for release notes.

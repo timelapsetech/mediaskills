@@ -75,9 +75,24 @@ PEP 723 inline dependencies are resolved automatically by `uv run` — no separa
 
 1. Run the script; capture stdout and exit code.
 2. Parse the **last non-empty line** of stdout as JSON.
-3. If `ok` is true, use `data` and `output_paths` for the next step.
+3. If `ok` is true, use `data` and `output_paths` for the next step **only after semantic checks below**.
 4. If exit code is `2`, run `install-media-tools` doctor/install.
 5. If exit code is `3`, read `error` and consult [ERRORS.md](ERRORS.md).
+
+## Semantic checks (beyond `ok: true`)
+
+`ok: true` means the script finished under the contract — not that the media or report matches the user's intent. Agents must also:
+
+1. Confirm every `output_paths` entry exists and has non-zero size.
+2. For transforms, re-probe with `inspect` (`describe.py` / `compare.py`) — duration, codec, resolution, stream counts vs request.
+3. Run domain validators when the skill provides them:
+   - `program_master.validate_report` / QC `passed: true`
+   - `forced_narrative_exact.validate_report` / completeness `publication_ready: true`
+   - `vision.validate_analysis` before on-screen text reports
+   - `caption.validate` before SCC / SMPTE-TT export
+4. Follow the skill's **Acceptance checks** in `SKILL.md` and [AGENTS.md](../AGENTS.md) **Always verify before deliver**.
+
+Optional CLI helper: `python scripts/verify_output.py` (path existence, optional duration bounds).
 
 ## Bash scripts (install-media-tools)
 

@@ -3,7 +3,7 @@
 Open-source [Agent Skills](https://agentskills.io) for media processing — portable instructions and scripts that help AI agents work with video, audio, images, captions, and broadcast formats.
 
 [![Skills](https://img.shields.io/badge/skills-14-blue)](skills/index.json)
-[![Tests](https://img.shields.io/badge/tests-102%2B-green)](./scripts/smoke.sh)
+[![Tests](https://img.shields.io/badge/tests-211%2B-green)](./scripts/smoke.sh)
 [![Spec](https://img.shields.io/badge/agentskills.io-compliant-purple)](https://agentskills.io/specification)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -15,8 +15,8 @@ Open-source [Agent Skills](https://agentskills.io) for media processing — port
 Read [AGENTS.md](AGENTS.md) for skill routing. Machine-readable catalog: [skills/index.json](skills/index.json).
 
 ```bash
-npx skills add timelapsetech/mediaskills@v0.1.2 --skill install-media-tools
-npx skills add timelapsetech/mediaskills@v0.1.2 --skill inspect
+npx skills add timelapsetech/mediaskills@v0.1.3 --skill install-media-tools
+npx skills add timelapsetech/mediaskills@v0.1.3 --skill inspect
 bash skills/install-media-tools/scripts/doctor.sh
 ```
 
@@ -24,16 +24,16 @@ bash skills/install-media-tools/scripts/doctor.sh
 
 ```bash
 # List available skills
-npx skills add timelapsetech/mediaskills@v0.1.2 --list
+npx skills add timelapsetech/mediaskills@v0.1.3 --list
 
-# Install all skills (pin @v0.1.2 for reproducibility)
-npx skills add timelapsetech/mediaskills@v0.1.2 --all
+# Install all skills (pin @v0.1.3 for reproducibility)
+npx skills add timelapsetech/mediaskills@v0.1.3 --all
 
 # Install one skill
-npx skills add timelapsetech/mediaskills@v0.1.2 --skill inspect
+npx skills add timelapsetech/mediaskills@v0.1.3 --skill inspect
 
 # Install globally
-npx skills add timelapsetech/mediaskills@v0.1.2 -g --skill audio
+npx skills add timelapsetech/mediaskills@v0.1.3 -g --skill audio
 ```
 
 ## System dependencies
@@ -101,20 +101,24 @@ Full spec: [docs/SCRIPT_CONTRACT.md](docs/SCRIPT_CONTRACT.md).
 
 ## Development
 
+Quality is enforced **locally** (no GitHub Actions for tests — Actions only deploys the [doc site](site/)).
+
 ```bash
-./scripts/bootstrap.sh
-./scripts/smoke.sh --full          # pre-publish gate
-./scripts/install-git-hooks.sh   # optional: smoke on git push
+./scripts/bootstrap.sh             # uv sync + installs pre-push smoke hook
+./scripts/smoke.sh                 # before every push
+./scripts/smoke.sh --full --self-test  # pre-publish / release confidence
 ```
 
 | Command | Purpose |
 | --- | --- |
 | `./scripts/check.sh` | Fast: validate, index check, pytest |
-| `./scripts/smoke.sh` | Doctor + check.sh |
-| `./scripts/smoke.sh --full --whisper` | Full confidence before release |
+| `./scripts/smoke.sh` | Doctor + check.sh (also runs on `git push` via hooks) |
+| `./scripts/smoke.sh --full --self-test` | CLI help smoke + golden skill self-tests |
+| `./scripts/smoke.sh --whisper` | Opt-in Whisper ASR integration tests |
+| `./scripts/install-git-hooks.sh` | Re-install pre-push hook if needed |
 | `python scripts/list_ops.py --write` | Refresh `skills/index.json` |
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md). Agents: verify outputs before delivery — [AGENTS.md](AGENTS.md).
 
 ## License
 

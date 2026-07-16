@@ -122,6 +122,13 @@ uv run scripts/proxy.py --input master.mp4
 | `scripts/extract_audio.py` | Audio track to MP3 |
 | `scripts/to_gif.py` | Short animated GIF |
 
+## Acceptance checks (agent must pass before delivery)
+
+1. Contract: exit 0, `ok: true`, every `output_paths` entry exists and is non-empty.
+2. Probe: `inspect.describe` / `compare` on each media output — duration, codec, resolution, and streams match the request.
+3. Spot-check: open or sample the deliverable (trim window correct, scale dimensions, audio present after mux).
+4. On failure: fix flags and retry; do not present unprobed transforms as done.
+
 ## Do not use for
 
 - Read-only metadata (use `inspect`)

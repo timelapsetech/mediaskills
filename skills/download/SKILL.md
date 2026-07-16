@@ -72,6 +72,13 @@ uv run scripts/url.py --url 'https://...' | jq -r '.output_paths[0]' | xargs -I{
 | --- | --- |
 | `scripts/url.py` | Download media from a URL |
 
+## Acceptance checks (agent must pass before delivery)
+
+1. Contract: exit 0, `ok: true`, every `output_paths` entry exists and is non-empty.
+2. Probe: immediately `inspect.describe` / `probe` the download — duration and codecs present.
+3. Spot-check: file size > 0; URL matches requested source; no truncated download errors in stderr.
+4. On failure: retry or escalate; do not chain transforms on a failed/partial download.
+
 ## Do not use for
 
 - Local file processing without a URL

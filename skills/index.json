@@ -1,5 +1,5 @@
 {
-  "version": "0.1.2",
+  "version": "0.1.3",
   "repository": "https://github.com/timelapsetech/mediaskills",
   "spec": "https://agentskills.io/specification",
   "skill_count": 14,
@@ -252,6 +252,16 @@
             "Pillow>=10",
             "pytesseract>=0.3.13"
           ],
+          "common_flags": [
+            "--input",
+            "--output"
+          ]
+        },
+        {
+          "script": "self_test.py",
+          "language": "python",
+          "op": "forced_narrative_exact.self_test",
+          "pep723_dependencies": [],
           "common_flags": [
             "--input",
             "--output"

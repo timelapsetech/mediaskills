@@ -22,4 +22,10 @@ else
   echo "(install-media-tools not yet present — skipping doctor)"
 fi
 
-echo "Bootstrap complete. Run: ./scripts/smoke.sh"
+echo "==> Installing local pre-push hook (quality gate; no cloud test CI)"
+bash scripts/install-git-hooks.sh
+
+echo "Bootstrap complete."
+echo "  Fast loop:  ./scripts/check.sh"
+echo "  Before push: ./scripts/smoke.sh"
+echo "  Release:     ./scripts/smoke.sh --full --self-test"

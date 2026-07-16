@@ -32,6 +32,17 @@ uv run scripts/replace_audio.py \
 - `normalize.py` outputs WAV; do not use `transcode.py` for external audio.
 - `replace_audio.py` uses `-shortest` — pad audio if video must run full length.
 
+## Verification gate
+
+```bash
+# After mux: duration of muxed output should approximate source video duration
+cd ../inspect
+uv run scripts/describe.py --input .mediaskills/generated/<muxed>.mp4
+uv run scripts/compare.py --input-a episode.mp4 --input-b .mediaskills/generated/<muxed>.mp4
+```
+
+If muxed duration is much shorter than source, audio was truncated (`-shortest`) — pad/extend audio and remux. Do not deliver without this check.
+
 ## Related skills
 
-`inspect` → `audio` → `video-transformation`
+`inspect` → `audio` → `video-transformation` → `inspect`

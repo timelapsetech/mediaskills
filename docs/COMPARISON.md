@@ -25,8 +25,8 @@
 
 ```bash
 # 1. Install skill into your agent environment
-npx skills add timelapsetech/mediaskills@v0.1.2 --skill install-media-tools
-npx skills add timelapsetech/mediaskills@v0.1.2 --skill inspect
+npx skills add timelapsetech/mediaskills@v0.1.3 --skill install-media-tools
+npx skills add timelapsetech/mediaskills@v0.1.3 --skill inspect
 
 # 2. Verify tools
 bash skills/install-media-tools/scripts/doctor.sh

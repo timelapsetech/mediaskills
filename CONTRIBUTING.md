@@ -2,19 +2,19 @@
 
 Thank you for helping improve Agent Skills for media processing.
 
-## Before opening a PR
+## Local quality gate (no cloud test CI)
 
-Run the publish smoke suite from the repo root:
+GitHub Actions only deploys the documentation site. Skill correctness is enforced on your machine via `smoke.sh` and the pre-push hook.
 
 ```bash
-./scripts/bootstrap.sh   # first time only
-./scripts/smoke.sh
+./scripts/bootstrap.sh   # first time: uv sync + installs pre-push hook
+./scripts/smoke.sh       # before every push / PR
 ```
 
 For full local confidence before a release:
 
 ```bash
-./scripts/smoke.sh --full --whisper
+./scripts/smoke.sh --full --self-test --whisper
 ```
 
 `./scripts/smoke.sh` runs:
@@ -27,6 +27,7 @@ Optional flags:
 | Flag | Adds |
 | --- | --- |
 | `--full` | `--help` smoke on every CLI script (`scripts/smoke_help.py`) |
+| `--self-test` | program-master / forced-narrative-exact golden self-tests |
 | `--whisper` | `MEDIASKILLS_RUN_WHISPER=1` speech-captions integration tests |
 | `--install` | Runs `install-media-tools` `install.sh` (may invoke brew/apt) |
 
@@ -35,6 +36,8 @@ Fast inner loop while editing:
 ```bash
 ./scripts/check.sh
 ```
+
+`./scripts/install-git-hooks.sh` (also run by bootstrap) installs a pre-push hook that runs `./scripts/smoke.sh`.
 
 ## Adding or updating a skill
 
@@ -51,9 +54,7 @@ Fast inner loop while editing:
 6. Run `python scripts/sync_shared_libs.py` after editing `_shared/`.
 7. Run `uv run agentskills validate skills/<name>` (or `skills-ref validate` if installed globally).
 8. Run `python scripts/list_ops.py --write` after adding scripts (updates `skills/index.json`).
-9. Run `./scripts/smoke.sh --full` before opening a PR.
-
-Optional: `./scripts/install-git-hooks.sh` installs a pre-push hook that runs `smoke.sh`.
+9. Run `./scripts/smoke.sh --full --self-test` before opening a PR.
 
 ## Optional integration tests
 

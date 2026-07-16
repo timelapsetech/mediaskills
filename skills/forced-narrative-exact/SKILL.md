@@ -122,6 +122,22 @@ Present the complete Markdown table, not a sample. State the cue count, source F
 
 Never label OCR output as exact until every cue has passed agent transcription review and boundary-frame QC. When a verified textless duplicate exists, also require a reviewed, publication-ready completeness audit.
 
+Run the golden self-test after changing report builders, validators, or fixtures:
+
+```bash
+uv run scripts/self_test.py --work-dir /absolute/path/forced-narrative-self-test
+```
+
+Or from the repo root: `./scripts/smoke.sh --self-test`.
+
+## Acceptance checks (agent must pass before delivery)
+
+1. Contract: exit 0, `ok: true`, every `output_paths` entry exists and is non-empty.
+2. Skill gate: `validate_report.py` succeeds; when a textless duplicate exists, completeness audit has `publication_ready: true`.
+3. Spot-check: complete the four-frame visual QC and sampling gates in [references/report-contract.md](references/report-contract.md).
+4. Never label OCR as exact until every cue passed agent transcription review and boundary-frame QC.
+5. On failure: fix seed/refinement and rebuild; do not deliver partial tables.
+
 ## Do not use for
 
 - speech-to-text captions from audio (use `speech-captions`)

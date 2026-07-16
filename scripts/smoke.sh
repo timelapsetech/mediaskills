@@ -6,24 +6,29 @@ cd "$ROOT"
 FULL=false
 WHISPER=false
 INSTALL=false
+SELF_TEST=false
 
 for arg in "$@"; do
   case "$arg" in
     --full) FULL=true ;;
     --whisper) WHISPER=true ;;
     --install) INSTALL=true ;;
+    --self-test) SELF_TEST=true ;;
     -h|--help)
       cat <<'EOF'
-Usage: ./scripts/smoke.sh [--full] [--whisper] [--install]
+Usage: ./scripts/smoke.sh [--full] [--whisper] [--install] [--self-test]
 
 Local publish validation gate (run from repo root).
+Quality is enforced locally — GitHub Actions only deploys the doc site.
 
-  (default)  doctor + check.sh (validate, sync, pytest)
-  --full     also run --help smoke on every CLI script
-  --whisper  also run speech-captions Whisper integration tests
-  --install  also run install-media-tools install.sh (may invoke brew/apt)
+  (default)    doctor + check.sh (validate, sync, pytest)
+  --full       also run --help smoke on every CLI script
+  --whisper    also run speech-captions Whisper integration tests
+  --install    also run install-media-tools install.sh (may invoke brew/apt)
+  --self-test  also run program-master (and forced-narrative if present) golden self-tests
 
 First time: ./scripts/bootstrap.sh
+Recommended: ./scripts/install-git-hooks.sh  # pre-push runs this smoke gate
 EOF
       exit 0
       ;;
@@ -94,6 +99,23 @@ print('install.sh OK')
 "
 fi
 
+if [[ "$SELF_TEST" == true ]]; then
+  WORK="$(mktemp -d "${TMPDIR:-/tmp}/mediaskills-self-test.XXXXXX")"
+  echo "==> program-master self_test (work-dir: $WORK/pm)"
+  (
+    cd skills/program-master
+    uv run scripts/self_test.py --work-dir "$WORK/pm"
+  )
+  if [[ -f skills/forced-narrative-exact/scripts/self_test.py ]]; then
+    echo "==> forced-narrative-exact self_test (work-dir: $WORK/fne)"
+    (
+      cd skills/forced-narrative-exact
+      uv run scripts/self_test.py --work-dir "$WORK/fne"
+    )
+  fi
+  rm -rf "$WORK"
+fi
+
 SKILL_COUNT="$(find skills -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')"
 echo ""
 echo "Smoke passed: ${SKILL_COUNT} skills, core tools OK."
@@ -105,4 +127,7 @@ if [[ "$WHISPER" == true ]]; then
 fi
 if [[ "$INSTALL" == true ]]; then
   echo "  --install: install.sh smoke passed"
+fi
+if [[ "$SELF_TEST" == true ]]; then
+  echo "  --self-test: golden skill self-tests passed"
 fi
